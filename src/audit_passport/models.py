@@ -70,6 +70,12 @@ class FindingCard:
     ranking_reason: str = ""
     action_rationale: str = ""
     ripple_note: str = ""
+    audit_blocker_probability: float = 0.0
+    credible_interval_low: float = 0.0
+    credible_interval_high: float = 0.0
+    uncertainty_level: str = "unscored"
+    probabilistic_reason: str = ""
+    scoring_method: str = "rules"
     memory_status: str = "active"
 
 
@@ -128,6 +134,12 @@ class InsightCard:
 class AuditReportCard:
     report_id: str
     readiness_score: int
+    readiness_probability: float
+    readiness_interval_low: float
+    readiness_interval_high: float
+    readiness_uncertainty: str
+    readiness_reason: str
+    readiness_method: str
     executive_summary: str
     critical_findings: list[str]
     ripple_updates: list[str]
@@ -204,7 +216,7 @@ def dataclass_to_dict(value: Any) -> dict[str, Any]:
 
 def card_to_markdown(card: Any) -> str:
     data = dataclass_to_dict(card)
-    title = data.get("type", card.__class__.__name__)
+    title = "FindingCard" if data.get("finding_id") else data.get("type", card.__class__.__name__)
     identity = (
         data.get("finding_id")
         or data.get("source_id")
@@ -222,4 +234,3 @@ def card_to_markdown(card: Any) -> str:
         f"{json.dumps(data, ensure_ascii=False, indent=2, default=str)}\n"
         "```\n"
     )
-

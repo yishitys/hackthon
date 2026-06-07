@@ -9,75 +9,68 @@
   <body>
     <div class="app-shell">
       <aside class="sidebar">
-        <div class="brand-mark">AP</div>
+        <div class="brand-mark">✓</div>
         <div>
-          <p class="eyebrow">Forensic Passport System</p>
+          <p class="eyebrow">Audit Passport</p>
           <h1>Audit Passport</h1>
           <p class="sidebar-copy">
-            A five-agent audit desk for rescuing corrupted manufacturing data before regulatory review.
+            Finds risky records, shows what matters, and tells the team what to do next.
           </p>
         </div>
 
         <div class="control-stack">
-          <button class="primary-action" id="runAgentsBtn" type="button">Run audit agents</button>
-          <button class="secondary-action" id="rippleBtn" type="button" disabled>New evidence found</button>
-          <button class="ghost-action" id="downloadReportBtn" type="button" disabled>Download report brief</button>
+          <button class="primary-action" id="runAgentsBtn" type="button">Start demo</button>
+          <button class="secondary-action" id="rippleBtn" type="button" disabled>Add new evidence</button>
+          <button class="ghost-action" id="downloadReportBtn" type="button" disabled>Download brief</button>
         </div>
 
         <div class="source-panel">
-          <span class="panel-label">Kaggle source</span>
-          <strong>Track 01 Data Rescue</strong>
+          <span class="panel-label">Demo data</span>
+          <strong>Warehouse records</strong>
           <small id="sourceMeta">Waiting for agent run</small>
         </div>
-
-        <nav class="rail-nav" aria-label="Audit Passport sections">
-          <a href="#readiness">Readiness</a>
-          <a href="#handoff">Agent handoff</a>
-          <a href="#queue">Passport queue</a>
-          <a href="#detail">Evidence detail</a>
-        </nav>
       </aside>
 
       <main>
         <section class="hero" id="readiness">
           <div class="hero-copy">
-            <p class="eyebrow">Four days before audit</p>
-            <h2>Turn corrupted warehouse records into signable evidence passports.</h2>
+            <p class="eyebrow">Before the audit</p>
+            <h2>Can we trust these records?</h2>
             <p>
-              Raw CSV rows stay outside Cognee. The system remembers reusable semantics:
-              source profiles, schema, findings, baselines, decisions, patches, outcomes, and feedback.
+              The demo checks the file, finds the biggest risks, and turns them into a short action list.
             </p>
           </div>
           <div class="readiness-card">
             <div class="score-ring" id="scoreRing">--</div>
-            <span>Audit readiness</span>
-            <small id="runId">Run not started</small>
+            <span>PyMC ready probability</span>
+            <small id="readyInterval">Run not started</small>
+            <small id="runId">No posterior yet</small>
           </div>
         </section>
 
         <section class="metric-grid" aria-label="Audit metrics">
           <article>
-            <span>Critical blockers</span>
+            <span>Urgent issues</span>
             <strong id="criticalMetric">0</strong>
           </article>
           <article>
-            <span>Findings found</span>
+            <span>Total issues</span>
             <strong id="findingsMetric">0</strong>
           </article>
           <article>
-            <span>Ready to sign</span>
+            <span>Can fix now</span>
             <strong id="readyMetric">0</strong>
           </article>
           <article>
-            <span>Memory patches</span>
+            <span>New facts</span>
             <strong id="patchMetric">0</strong>
           </article>
         </section>
 
         <section class="stage-section" id="handoff">
           <div class="section-heading">
-            <p class="eyebrow">Cognee semantic memory</p>
-            <h2>Five-agent handoff map</h2>
+            <p class="eyebrow">How it works</p>
+            <h2>Five simple steps</h2>
           </div>
           <div class="stage-grid" id="stageGrid"></div>
         </section>
@@ -85,21 +78,21 @@
         <section class="workbench">
           <div class="queue-panel" id="queue">
             <div class="section-heading compact">
-              <p class="eyebrow">Risk queue</p>
-              <h2>Audit passports</h2>
+              <p class="eyebrow">Action list</p>
+              <h2>What needs attention</h2>
             </div>
             <div class="passport-list" id="passportList">
-              <div class="empty-state">Run the agents to generate evidence-backed passports.</div>
+              <div class="empty-state">Start the demo to see the risk list.</div>
             </div>
           </div>
 
           <div class="detail-panel" id="detail">
             <div class="section-heading compact">
-              <p class="eyebrow">Evidence detail</p>
-              <h2 id="detailTitle">No passport selected</h2>
+              <p class="eyebrow">Selected issue</p>
+              <h2 id="detailTitle">Nothing selected yet</h2>
             </div>
             <div id="passportDetail" class="detail-body">
-              Select a passport after running the agents.
+              Pick an issue from the list after starting the demo.
             </div>
           </div>
         </section>
@@ -107,25 +100,15 @@
         <section class="ripple-section">
           <div class="ripple-card">
             <div>
-              <p class="eyebrow">Memory Ripple</p>
-              <h2>One memory update changes the whole audit story.</h2>
+              <p class="eyebrow">New evidence</p>
+              <h2>When new facts arrive, the recommendation changes.</h2>
               <p id="rippleSummary">
-                Click New evidence found after the first run to apply a Memory Patch and refresh risk, action, and report language.
+                After the first run, add new evidence to see one issue become less risky.
               </p>
             </div>
             <div class="diff-card" id="diffCard">
-              <span>Before / after appears here</span>
+              <span>Before and after will appear here.</span>
             </div>
-          </div>
-        </section>
-
-        <section class="timeline-section">
-          <div class="section-heading compact">
-            <p class="eyebrow">Inspectable proof</p>
-            <h2>Memory timeline</h2>
-          </div>
-          <div class="timeline" id="memoryTimeline">
-            <div class="empty-state">No memory events yet.</div>
           </div>
         </section>
       </main>
@@ -134,4 +117,3 @@
     <script src="./app.js"></script>
   </body>
 </html>
-

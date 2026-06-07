@@ -5,6 +5,7 @@ from pathlib import Path
 from fpdf import FPDF
 
 from .models import AuditReportCard, FindingCard, MemoryPatch, slug_time
+from .probabilistic import score_readiness_with_pymc
 
 
 ARTIFACT_DIR = Path("runtime/artifacts")
@@ -31,6 +32,7 @@ def executive_summary(findings: list[FindingCard], patches: list[MemoryPatch]) -
 
 def build_report_card(findings: list[FindingCard], patches: list[MemoryPatch], pdf_path: Path) -> AuditReportCard:
     score = readiness_score(findings)
+    readiness = score_readiness_with_pymc(findings, patch_count=len(patches))
     critical = [finding.finding_id for finding in findings if finding.severity in {"Critical", "High"}]
     open_risks = [
         f"{finding.finding_id}: {finding.why_broken}"
@@ -40,6 +42,12 @@ def build_report_card(findings: list[FindingCard], patches: list[MemoryPatch], p
     return AuditReportCard(
         report_id=f"AR-{slug_time()}",
         readiness_score=score,
+        readiness_probability=readiness.probability,
+        readiness_interval_low=readiness.ci_low,
+        readiness_interval_high=readiness.ci_high,
+        readiness_uncertainty=readiness.uncertainty_level,
+        readiness_reason=readiness.reason,
+        readiness_method=readiness.method,
         executive_summary=executive_summary(findings, patches),
         critical_findings=critical,
         ripple_updates=[patch.patch_id for patch in patches],
@@ -64,7 +72,15 @@ def generate_pdf(findings: list[FindingCard], patches: list[MemoryPatch]) -> Aud
     pdf.set_font("Helvetica", "B", 18)
     pdf.cell(0, 10, "Audit Passport Summary", new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 7, f"Readiness score: {report.readiness_score}/100", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 7, f"Rule readiness score: {report.readiness_score}/100", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        0,
+        7,
+        f"PyMC readiness probability: {round(report.readiness_probability * 100)}% "
+        f"(90% CI {round(report.readiness_interval_low * 100)}%-{round(report.readiness_interval_high * 100)}%)",
+        new_x="LMARGIN",
+        new_y="NEXT",
+    )
     pdf.ln(2)
     pdf.set_font("Helvetica", "", 11)
     write_line(pdf, report.executive_summary, 6)

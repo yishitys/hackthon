@@ -5,6 +5,7 @@ from dataclasses import replace
 from .agents import AGENT_1, AGENT_2, AGENT_3, AGENT_4, AGENT_5, severity_from_score
 from .memory import MemoryRecorder
 from .models import AgentOutcomeCard, AuditRun, MemoryPatch
+from .probabilistic import attach_probabilistic_risk
 from .report import generate_pdf
 
 
@@ -91,6 +92,7 @@ async def apply_memory_ripple(run: AuditRun, use_cognee: bool = True) -> AuditRu
             ),
             last_updated_by_agent=AGENT_2,
         )
+        updated = attach_probabilistic_risk(updated)
         updated_findings.append(updated)
         await memory.remember_card(updated, "findings", AGENT_2)
 
@@ -118,4 +120,3 @@ async def apply_memory_ripple(run: AuditRun, use_cognee: bool = True) -> AuditRu
     run.memory_events.extend(event.__dict__ for event in memory.events)
     run.cognee_errors.extend(memory.errors)
     return run
-

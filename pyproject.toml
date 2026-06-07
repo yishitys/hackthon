@@ -8,6 +8,7 @@ dependencies = [
     "cognee==1.1.2",
     "fpdf2>=2.7.9",
     "pandas>=2.2.2",
+    "pymc>=5.16.0",
     "pymupdf>=1.27.2",
     "python-dotenv>=1.0.1",
     "streamlit>=1.36.0",

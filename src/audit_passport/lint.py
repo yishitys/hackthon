@@ -20,7 +20,7 @@ PROMOTABLE_TYPES = {
 
 def lint_card(card: Any) -> tuple[bool, str]:
     data = asdict(card) if is_dataclass(card) else dict(card)
-    card_type = data.get("type", card.__class__.__name__)
+    card_type = "FindingCard" if data.get("finding_id") else data.get("type", card.__class__.__name__)
     if card_type not in PROMOTABLE_TYPES:
         return False, f"unsupported memory type: {card_type}"
     serialized = str(data).lower()
@@ -33,4 +33,3 @@ def lint_card(card: Any) -> tuple[bool, str]:
     if data.get("status") in {"rejected", "expired"}:
         return False, f"memory status is {data.get('status')}"
     return True, "active"
-

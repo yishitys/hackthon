@@ -19,6 +19,7 @@ from .models import (
     build_sessions,
     new_run_id,
 )
+from .probabilistic import attach_probabilistic_risk
 from .report import generate_pdf
 
 
@@ -410,8 +411,7 @@ async def run_risk_prioritizer(
             score -= 8
             reason_parts.append("Duplicate records are usually easier to quarantine than numeric contradictions.")
         score = max(0, min(100, score))
-        ranked.append(
-            replace(
+        ranked_finding = replace(
                 finding,
                 risk_score=score,
                 severity=severity_from_score(score),
@@ -420,7 +420,7 @@ async def run_risk_prioritizer(
                 or "Ranked using audit impact, evidence strength, and remediation difficulty.",
                 last_updated_by_agent=agent,
             )
-        )
+        ranked.append(attach_probabilistic_risk(ranked_finding))
     ranked.sort(key=lambda item: item.risk_score, reverse=True)
     for finding in ranked:
         await memory.remember_card(finding, "findings", agent)
