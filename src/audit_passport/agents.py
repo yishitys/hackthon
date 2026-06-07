@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import math
+from dataclasses import asdict
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -10,15 +12,23 @@ from .data_loader import LoadedTable, evidence_for_rows, load_kaggle_tables, val
 from .memory import MemoryRecorder
 from .models import (
     AgentOutcomeCard,
+    AgentPromptTraceCard,
     AuditRun,
     ClassificationBaselineCard,
+    DataSourceCard,
+    DetectionCandidateCard,
     Evidence,
+    FeedbackDigestCard,
     FindingCard,
+    InsightCard,
     PROJECT_ID,
     ReconciliationDecisionCard,
+    SchemaCard,
     build_sessions,
     new_run_id,
+    slug_time,
 )
+from .gpt_agents import GptAgentClient, JsonSchemaSpec
 from .probabilistic import attach_probabilistic_risk
 from .report import generate_pdf
 
@@ -333,251 +343,472 @@ def detect_missing_evidence(table: LoadedTable, next_index: int) -> list[Finding
     ]
 
 
-async def run_data_detective(memory: MemoryRecorder, data_dir: Path) -> tuple[list[LoadedTable], list[FindingCard], list[AgentOutcomeCard]]:
+def card_dict(card: Any) -> dict[str, Any]:
+    return asdict(card)
+
+
+def evidence_from_dict(value: dict[str, Any]) -> Evidence:
+    return Evidence(
+        source_file=str(value.get("source_file", "")),
+        row_number=str(value.get("row_number", "")),
+        field_name=str(value.get("field_name", "")),
+        observed_value=str(value.get("observed_value", "")),
+        expected_or_conflicting_value=str(value.get("expected_or_conflicting_value", "")),
+        explanation=str(value.get("explanation", "")),
+    )
+
+
+def dict_items(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, dict)]
+
+
+def insight_items(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    items: list[dict[str, Any]] = []
+    for item in value:
+        if isinstance(item, dict):
+            items.append(item)
+        elif isinstance(item, str) and item.strip():
+            items.append({"claim": item.strip(), "evidence_refs": [], "confidence": 0.7, "caveats": []})
+    return items
+
+
+def dict_value(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def candidate_from_rule_finding(index: int, table: LoadedTable, finding: FindingCard) -> DetectionCandidateCard:
+    return DetectionCandidateCard(
+        candidate_id=f"DC-{index:03d}",
+        source_id=table.source_card.source_id,
+        candidate_type=finding.type,
+        affected_entity=finding.affected_entity,
+        detector_reason=finding.why_broken,
+        suggested_risk_score=finding.risk_score,
+        evidence=finding.evidence,
+    )
+
+
+def build_detection_candidates(tables: list[LoadedTable]) -> list[DetectionCandidateCard]:
+    candidates: list[DetectionCandidateCard] = []
+    detectors = (
+        detect_impossible_dates,
+        detect_impossible_values,
+        detect_unit_conflicts,
+        detect_contradictory_numbers,
+        detect_duplicate_rows,
+        detect_missing_evidence,
+    )
+    for table in tables:
+        rule_findings = detect_orphaned_references(table, len(candidates) + 1, tables)
+        for detector in detectors:
+            rule_findings.extend(detector(table, len(candidates) + len(rule_findings) + 1))
+        for finding in rule_findings:
+            candidates.append(candidate_from_rule_finding(len(candidates) + 1, table, finding))
+    return candidates
+
+
+def latest_findings(cards: list[FindingCard]) -> list[FindingCard]:
+    by_id: dict[str, FindingCard] = {}
+    for card in cards:
+        by_id[card.finding_id] = card
+    return list(by_id.values())
+
+
+async def remember_many(
+    memory: MemoryRecorder,
+    cards: list[Any],
+    dataset_key: str,
+    agent: str,
+    session_id: str,
+    shared_session_id: str,
+) -> None:
+    await memory.remember_cards(cards, dataset_key, agent, session_id=session_id, shared_session_id=shared_session_id)
+
+
+async def remember_trace(
+    memory: MemoryRecorder,
+    trace: AgentPromptTraceCard,
+    agent: str,
+    session_id: str,
+    shared_session_id: str,
+) -> None:
+    await memory.remember_card(trace, "prompt_traces", agent, session_id=session_id, shared_session_id=shared_session_id)
+
+
+def finding_from_agent(data: dict[str, Any], agent: str) -> FindingCard:
+    score = int(data.get("risk_score", 50))
+    evidence = [evidence_from_dict(item) for item in dict_items(data.get("evidence", []))]
+    return FindingCard(
+        finding_id=str(data.get("finding_id") or f"F-{slug_time()}"),
+        type=str(data.get("type") or data.get("candidate_type") or "Audit finding"),
+        severity=str(data.get("severity") or severity_from_score(score)),
+        risk_score=max(0, min(100, score)),
+        confidence=float(data.get("confidence", 0.78)),
+        affected_entity=str(data.get("affected_entity", "")),
+        audit_risk=str(data.get("audit_risk", "May weaken audit readiness.")),
+        why_broken=str(data.get("why_broken", "")),
+        suggested_action=str(data.get("suggested_action", "Pending triage")),
+        status=str(data.get("status", "Open")),
+        evidence=evidence,
+        created_by_agent=str(data.get("created_by_agent", AGENT_1)),
+        last_updated_by_agent=agent,
+        ranking_reason=str(data.get("ranking_reason", "")),
+        action_rationale=str(data.get("action_rationale", "")),
+    )
+
+
+def baseline_from_agent(data: dict[str, Any]) -> ClassificationBaselineCard:
+    return ClassificationBaselineCard(
+        baseline_id=str(data.get("baseline_id", "BL-001")),
+        critical_fields=[str(item) for item in data.get("critical_fields", [])],
+        audit_sensitive_issue_types=[str(item) for item in data.get("audit_sensitive_issue_types", [])],
+        severity_rules={str(key): str(value) for key, value in data.get("severity_rules", {}).items()},
+        unit_rules={str(key): str(value) for key, value in data.get("unit_rules", {}).items()},
+        confidence=float(data.get("confidence", 0.8)),
+    )
+
+
+def outcome_from_agent(data: dict[str, Any], agent: str, read: list[str], wrote: list[str]) -> AgentOutcomeCard:
+    return AgentOutcomeCard(
+        agent=agent,
+        task=str(data.get("task", "")),
+        read_datasets=read,
+        wrote_datasets=wrote,
+        outcome=str(data.get("outcome", "")),
+        reason=str(data.get("reason", "")),
+        evidence_refs=[str(item) for item in data.get("evidence_refs", [])],
+        memory_reads=len(read),
+        memory_writes=len(wrote),
+    )
+
+
+def agent_schema(name: str, required: tuple[str, ...], properties: dict[str, Any]) -> JsonSchemaSpec:
+    return JsonSchemaSpec(
+        name=name,
+        required_top_level=required,
+        schema={
+            "type": "object",
+            "additionalProperties": True,
+            "required": list(required),
+            "properties": properties,
+        },
+    )
+
+
+INGEST_SCHEMA = agent_schema(
+    "ingestion_agent_output",
+    ("findings", "outcome"),
+    {"findings": {"type": "array"}, "outcome": {"type": "object"}},
+)
+RISK_SCHEMA = agent_schema(
+    "risk_agent_output",
+    ("baseline", "ranking_updates", "outcome"),
+    {"baseline": {"type": "object"}, "ranking_updates": {"type": "array"}, "outcome": {"type": "object"}},
+)
+REMEDIATION_SCHEMA = agent_schema(
+    "remediation_agent_output",
+    ("action_updates", "decisions", "outcome"),
+    {"action_updates": {"type": "array"}, "decisions": {"type": "array"}, "outcome": {"type": "object"}},
+)
+NARRATIVE_SCHEMA = agent_schema(
+    "narrative_agent_output",
+    ("insights", "report_narrative", "outcome"),
+    {"insights": {"type": "array"}, "report_narrative": {"type": "object"}, "outcome": {"type": "object"}},
+)
+FEEDBACK_SCHEMA = agent_schema(
+    "feedback_agent_output",
+    ("feedback_digest", "outcome"),
+    {"feedback_digest": {"type": "object"}, "outcome": {"type": "object"}},
+)
+
+
+async def run_data_detective(
+    memory: MemoryRecorder,
+    llm: GptAgentClient,
+    data_dir: Path,
+    sessions: dict[str, str],
+) -> tuple[list[LoadedTable], list[DetectionCandidateCard], list[FindingCard], list[AgentOutcomeCard], list[AgentPromptTraceCard]]:
     agent = AGENT_1
-    await memory.recall(
-        "Find prior data source, schema, and active memory patches before ingesting Kaggle audit data.",
+    session_id = sessions["ingest"]
+    shared_session_id = sessions["shared"]
+    prior_context = await memory.recall(
+        "Find prior data source, schema, active memory patches, and past ingestion decisions before ingesting Kaggle audit data.",
         ["sources", "schema", "memory_patches"],
         agent,
+        session_id=shared_session_id,
     )
     tables = load_kaggle_tables(data_dir)
-    findings: list[FindingCard] = []
-    for table in tables:
-        await memory.remember_card(table.source_card, "sources", agent)
-        await memory.remember_card(table.schema_card, "schema", agent)
-        findings.extend(detect_orphaned_references(table, len(findings) + 1, tables))
-        detectors = (
-            detect_impossible_dates,
-            detect_impossible_values,
-            detect_unit_conflicts,
-            detect_contradictory_numbers,
-            detect_duplicate_rows,
-            detect_missing_evidence,
-        )
-        for detector in detectors:
-            findings.extend(detector(table, len(findings) + 1))
-    for finding in findings:
-        await memory.remember_card(finding, "findings", agent)
-    outcome = AgentOutcomeCard(
-        agent=agent,
-        task="Profile Kaggle manufacturing data and create evidence-backed finding cards without storing full raw rows in Cognee.",
-        read_datasets=["sources", "schema", "memory_patches"],
-        wrote_datasets=["sources", "schema", "findings", "agent_outcomes"],
-        outcome=f"Loaded {len(tables)} source files and produced {len(findings)} finding cards.",
-        reason="Cognee stores semantic cards and evidence pointers; raw CSV remains in data/kaggle.",
-        evidence_refs=[finding.finding_id for finding in findings[:5]],
-        memory_reads=1,
-        memory_writes=2 + len(findings),
+    candidates = build_detection_candidates(tables)
+    await remember_many(memory, [table.source_card for table in tables], "sources", agent, session_id, shared_session_id)
+    await remember_many(memory, [table.schema_card for table in tables], "schema", agent, session_id, shared_session_id)
+    await remember_many(memory, candidates, "detection_candidates", agent, session_id, shared_session_id)
+
+    result = await llm.run_json(
+        agent,
+        "You are Agent 1, the ingestion and data detective agent. Promote deterministic detector candidates into evidence-backed FindingCard JSON. Do not invent raw rows. Use only evidence pointers provided.",
+        {
+            "agent_setting": {"role": agent, "goal": "turn script candidates into audit findings"},
+            "prior_cognee_context": prior_context,
+            "sources": [card_dict(table.source_card) for table in tables],
+            "schemas": [card_dict(table.schema_card) for table in tables],
+            "detection_candidates": [card_dict(candidate) for candidate in candidates],
+            "output_contract": "Return findings[] as FindingCard-shaped objects and outcome as AgentOutcome-shaped fields.",
+        },
+        INGEST_SCHEMA,
+        ["sources", "schema", "memory_patches"],
+        ["findings", "agent_outcomes", "prompt_traces"],
     )
-    await memory.remember_card(outcome, "agent_outcomes", agent)
-    return tables, findings, [outcome]
+    findings = [finding_from_agent(item, agent) for item in dict_items(result.data.get("findings", []))]
+    outcome = outcome_from_agent(
+        dict_value(result.data.get("outcome", {})),
+        agent,
+        ["sources", "schema", "memory_patches"],
+        ["sources", "schema", "detection_candidates", "findings", "agent_outcomes", "prompt_traces"],
+    )
+    await remember_many(memory, findings, "findings", agent, session_id, shared_session_id)
+    await memory.remember_card(outcome, "agent_outcomes", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await remember_trace(memory, result.trace, agent, session_id, shared_session_id)
+    return tables, candidates, findings, [outcome], [result.trace]
 
 
 async def run_risk_prioritizer(
     memory: MemoryRecorder,
-    findings: list[FindingCard],
-) -> tuple[list[FindingCard], list[ClassificationBaselineCard], list[AgentOutcomeCard]]:
+    llm: GptAgentClient,
+    sessions: dict[str, str],
+) -> tuple[list[FindingCard], list[ClassificationBaselineCard], list[AgentOutcomeCard], list[AgentPromptTraceCard]]:
     agent = AGENT_2
-    await memory.recall(
-        "Rank audit findings using source cards, schema cards, finding cards, and active memory patches.",
-        ["sources", "schema", "findings", "baselines", "memory_patches"],
+    session_id = sessions["classify"]
+    shared_session_id = sessions["shared"]
+    findings = await memory.recall_cards(
+        "Recall every active FindingCard created by Agent 1 for risk ranking.",
+        ["findings"],
         agent,
+        (FindingCard,),
+        top_k=60,
+        session_id=shared_session_id,
+        required=True,
     )
-    baseline = ClassificationBaselineCard(
-        baseline_id="BL-001",
-        critical_fields=["batch", "supplier", "inspection", "shipment", "potency", "weight", "quantity", "status"],
-        audit_sensitive_issue_types=["Contradictory numbers", "Unit conflict", "Missing evidence", "Duplicate records"],
-        severity_rules={
-            "Critical": "Score 85-100: direct contradiction in auditable measurement or unresolved regulatory evidence.",
-            "High": "Score 70-84: likely audit blocker but can be explained or contained.",
-            "Medium": "Score 40-69: needs review, lower direct audit impact.",
-            "Low": "Score 0-39: cosmetic or localized issue.",
+    findings = latest_findings(findings)
+    sources = await memory.recall_cards("Recall source cards for ranking context.", ["sources"], agent, (DataSourceCard,), top_k=20, session_id=shared_session_id)
+    schemas = await memory.recall_cards("Recall schema cards for ranking context.", ["schema"], agent, (SchemaCard,), top_k=20, session_id=shared_session_id)
+    result = await llm.run_json(
+        agent,
+        "You are Agent 2, the classification and risk prioritizer. Read recalled FindingCards from Cognee, create a baseline, and rank/update each finding. Return only updates for recalled finding IDs.",
+        {
+            "agent_setting": {"role": agent, "goal": "rank audit findings by regulatory risk"},
+            "recalled_findings": [card_dict(item) for item in findings],
+            "recalled_sources": [card_dict(item) for item in sources],
+            "recalled_schemas": [card_dict(item) for item in schemas],
+            "output_contract": "Return baseline, ranking_updates[{finding_id,risk_score,severity,confidence,ranking_reason}], and outcome.",
         },
-        unit_rules={"mg_to_g": "Normalize milligrams and grams before treating values as contradictions."},
-        confidence=0.82,
+        RISK_SCHEMA,
+        ["sources", "schema", "findings"],
+        ["baselines", "findings", "agent_outcomes", "prompt_traces"],
     )
-    await memory.remember_card(baseline, "baselines", agent)
+    baseline = baseline_from_agent(dict_value(result.data.get("baseline", {})))
+    by_id = {finding.finding_id: finding for finding in findings}
     ranked: list[FindingCard] = []
-    for finding in findings:
-        score = finding.risk_score
-        reason_parts = []
-        if finding.type in {"Contradictory numbers", "Unit conflict"}:
-            score += 6
-            reason_parts.append("The issue touches auditable measurements.")
-        if len(finding.evidence) >= 2:
-            score += 4
-            reason_parts.append("Multiple evidence pointers support the finding.")
-        if finding.type == "Duplicate records":
-            score -= 8
-            reason_parts.append("Duplicate records are usually easier to quarantine than numeric contradictions.")
-        score = max(0, min(100, score))
-        ranked_finding = replace(
-                finding,
-                risk_score=score,
-                severity=severity_from_score(score),
-                confidence=min(0.96, round(finding.confidence + 0.08, 2)),
-                ranking_reason=" ".join(reason_parts)
-                or "Ranked using audit impact, evidence strength, and remediation difficulty.",
-                last_updated_by_agent=agent,
+    for update in dict_items(result.data.get("ranking_updates", [])):
+        finding = by_id.get(str(update.get("finding_id")))
+        if finding is None:
+            continue
+        score = max(0, min(100, int(update.get("risk_score", finding.risk_score))))
+        ranked.append(
+            attach_probabilistic_risk(
+                replace(
+                    finding,
+                    risk_score=score,
+                    severity=str(update.get("severity") or severity_from_score(score)),
+                    confidence=float(update.get("confidence", finding.confidence)),
+                    ranking_reason=str(update.get("ranking_reason", "")),
+                    last_updated_by_agent=agent,
+                )
             )
-        ranked.append(attach_probabilistic_risk(ranked_finding))
+        )
+    if not ranked:
+        raise RuntimeError(f"{agent} produced no ranking updates for recalled findings.")
     ranked.sort(key=lambda item: item.risk_score, reverse=True)
-    for finding in ranked:
-        await memory.remember_card(finding, "findings", agent)
-    outcome = AgentOutcomeCard(
-        agent=agent,
-        task="Create audit classification baseline and rank findings by regulatory risk.",
-        read_datasets=["sources", "schema", "findings", "baselines", "memory_patches"],
-        wrote_datasets=["baselines", "findings", "agent_outcomes"],
-        outcome=f"Ranked {len(ranked)} findings. Top risk: {ranked[0].finding_id if ranked else 'none'}.",
-        reason="Agent 2 recalled Agent 1 finding cards and applied severity rules instead of rescanning raw CSV.",
-        evidence_refs=[finding.finding_id for finding in ranked[:5]],
-        memory_reads=1,
-        memory_writes=1 + len(ranked),
-    )
-    await memory.remember_card(outcome, "agent_outcomes", agent)
-    return ranked, [baseline], [outcome]
+    outcome = outcome_from_agent(dict_value(result.data.get("outcome", {})), agent, ["sources", "schema", "findings"], ["baselines", "findings", "agent_outcomes", "prompt_traces"])
+    await memory.remember_card(baseline, "baselines", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await remember_many(memory, ranked, "findings", agent, session_id, shared_session_id)
+    await memory.remember_card(outcome, "agent_outcomes", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await remember_trace(memory, result.trace, agent, session_id, shared_session_id)
+    return ranked, [baseline], [outcome], [result.trace]
 
 
 async def run_remediation_planner(
     memory: MemoryRecorder,
-    findings: list[FindingCard],
-) -> tuple[list[FindingCard], list[ReconciliationDecisionCard], list[AgentOutcomeCard]]:
+    llm: GptAgentClient,
+    sessions: dict[str, str],
+) -> tuple[list[FindingCard], list[ReconciliationDecisionCard], list[AgentOutcomeCard], list[AgentPromptTraceCard]]:
     agent = AGENT_3
-    await memory.recall(
-        "Plan remediation from ranked findings, classification baselines, prior reconciliation decisions, and patches.",
-        ["findings", "baselines", "reconciliation", "memory_patches"],
+    session_id = sessions["reconcile"]
+    shared_session_id = sessions["shared"]
+    findings = await memory.recall_cards(
+        "Recall ranked FindingCards with probability fields for remediation planning.",
+        ["findings"],
         agent,
+        (FindingCard,),
+        top_k=80,
+        session_id=shared_session_id,
+        required=True,
     )
+    findings = latest_findings(findings)
+    baselines = await memory.recall_cards("Recall classification baseline.", ["baselines"], agent, (ClassificationBaselineCard,), top_k=10, session_id=shared_session_id)
+    result = await llm.run_json(
+        agent,
+        "You are Agent 3, the reconciliation and remediation agent. Use only recalled ranked findings and baselines. Choose action: Safe Auto-Fix, Suggested Fix, Manual Review Required, or Escalate.",
+        {
+            "agent_setting": {"role": agent, "goal": "choose auditable remediation actions"},
+            "recalled_ranked_findings": [card_dict(item) for item in findings],
+            "recalled_baselines": [card_dict(item) for item in baselines],
+            "output_contract": "Return action_updates and decisions. Each decision must reference a recalled finding_id.",
+        },
+        REMEDIATION_SCHEMA,
+        ["findings", "baselines"],
+        ["reconciliation", "findings", "agent_outcomes", "prompt_traces"],
+    )
+    by_id = {finding.finding_id: finding for finding in findings}
     planned: list[FindingCard] = []
-    decisions: list[ReconciliationDecisionCard] = []
-    for finding in findings:
-        if finding.type == "Duplicate records":
-            action = "Safe Auto-Fix"
-            rationale = "Duplicate rows can be quarantined or de-duplicated with a reversible audit log."
-        elif finding.type == "Unit conflict":
-            action = "Manual Review Required"
-            rationale = "Unit conflicts need source metadata before numeric values are normalized."
-        elif finding.risk_score >= 85:
-            action = "Escalate"
-            rationale = "The finding affects high-risk audit evidence and needs supervisor review before sign-off."
-        else:
-            action = "Suggested Fix"
-            rationale = "Evidence is strong enough for a recommended correction, but a human should confirm it."
-        updated = replace(
-            finding,
-            suggested_action=action,
-            action_rationale=rationale,
-            last_updated_by_agent=agent,
-        )
-        planned.append(updated)
-        evidence_refs = [f"{item.source_file}:{item.row_number}" for item in finding.evidence]
-        decisions.append(
-            ReconciliationDecisionCard(
-                decision_id=f"RD-{finding.finding_id[2:]}",
-                finding_id=finding.finding_id,
-                conflict=finding.why_broken,
-                chosen_resolution=action,
-                evidence_refs=evidence_refs,
-                affected_agents=[AGENT_2, AGENT_4],
-                rationale=rationale,
+    for update in dict_items(result.data.get("action_updates", [])):
+        finding = by_id.get(str(update.get("finding_id")))
+        if finding is None:
+            continue
+        planned.append(
+            replace(
+                finding,
+                suggested_action=str(update.get("suggested_action", finding.suggested_action)),
+                action_rationale=str(update.get("action_rationale", "")),
+                last_updated_by_agent=agent,
             )
         )
-    for decision in decisions:
-        await memory.remember_card(decision, "reconciliation", agent)
-    for finding in planned:
-        await memory.remember_card(finding, "findings", agent)
-    outcome = AgentOutcomeCard(
-        agent=agent,
-        task="Choose fix, flag, manual review, or escalation for ranked findings.",
-        read_datasets=["findings", "baselines", "reconciliation", "memory_patches"],
-        wrote_datasets=["reconciliation", "findings", "agent_outcomes"],
-        outcome=f"Created {len(decisions)} remediation decisions.",
-        reason="Agent 3 recalled ranked findings and classification baselines, then wrote action rationales and reconciliation cards.",
-        evidence_refs=[decision.decision_id for decision in decisions[:5]],
-        memory_reads=1,
-        memory_writes=len(decisions) + len(planned),
-    )
-    await memory.remember_card(outcome, "agent_outcomes", agent)
-    return planned, decisions, [outcome]
+    decisions = [
+        ReconciliationDecisionCard(
+            decision_id=str(item.get("decision_id", f"RD-{idx:03d}")),
+            finding_id=str(item.get("finding_id", "")),
+            conflict=str(item.get("conflict", "")),
+            chosen_resolution=str(item.get("chosen_resolution", "")),
+            evidence_refs=[str(ref) for ref in item.get("evidence_refs", [])],
+            affected_agents=[str(ref) for ref in item.get("affected_agents", [AGENT_2, AGENT_4])],
+            rationale=str(item.get("rationale", "")),
+        )
+        for idx, item in enumerate(dict_items(result.data.get("decisions", [])), start=1)
+        if str(item.get("finding_id", "")) in by_id
+    ]
+    if not planned:
+        raise RuntimeError(f"{agent} produced no action updates for recalled findings.")
+    planned.sort(key=lambda item: item.risk_score, reverse=True)
+    outcome = outcome_from_agent(dict_value(result.data.get("outcome", {})), agent, ["findings", "baselines"], ["reconciliation", "findings", "agent_outcomes", "prompt_traces"])
+    await remember_many(memory, decisions, "reconciliation", agent, session_id, shared_session_id)
+    await remember_many(memory, planned, "findings", agent, session_id, shared_session_id)
+    await memory.remember_card(outcome, "agent_outcomes", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await remember_trace(memory, result.trace, agent, session_id, shared_session_id)
+    return planned, decisions, [outcome], [result.trace]
 
 
 async def run_audit_narrator(
     memory: MemoryRecorder,
-    findings: list[FindingCard],
+    llm: GptAgentClient,
+    sessions: dict[str, str],
     patches: list,
-) -> tuple[list, object, list[AgentOutcomeCard]]:
+) -> tuple[list[InsightCard], object, list[AgentOutcomeCard], list[AgentPromptTraceCard]]:
     agent = AGENT_4
-    await memory.recall(
-        "Generate a compliance officer readable audit summary from source, findings, baselines, decisions, patches, and outcomes.",
-        ["sources", "schema", "findings", "baselines", "reconciliation", "memory_patches", "agent_outcomes"],
+    session_id = sessions["narrative"]
+    shared_session_id = sessions["shared"]
+    findings = latest_findings(await memory.recall_cards("Recall final remediated findings for the report.", ["findings"], agent, (FindingCard,), top_k=80, session_id=shared_session_id, required=True))
+    decisions = await memory.recall_cards("Recall remediation decisions for the report.", ["reconciliation"], agent, (ReconciliationDecisionCard,), top_k=80, session_id=shared_session_id)
+    baselines = await memory.recall_cards("Recall baselines for the report.", ["baselines"], agent, (ClassificationBaselineCard,), top_k=10, session_id=shared_session_id)
+    result = await llm.run_json(
         agent,
+        "You are Agent 4, the narrative and audit report agent. Write compliance-officer readable claims from recalled memory cards only. The PDF renderer will render your narrative.",
+        {
+            "agent_setting": {"role": agent, "goal": "produce evidence-backed audit narrative"},
+            "recalled_findings": [card_dict(item) for item in findings],
+            "recalled_decisions": [card_dict(item) for item in decisions],
+            "recalled_baselines": [card_dict(item) for item in baselines],
+            "patches": [card_dict(item) for item in patches],
+            "output_contract": "Return insights, report_narrative{executive_summary,open_risks[]}, and outcome.",
+        },
+        NARRATIVE_SCHEMA,
+        ["findings", "baselines", "reconciliation", "memory_patches", "agent_outcomes"],
+        ["insights", "reports", "agent_outcomes", "prompt_traces"],
     )
-    from .models import InsightCard
-
-    top = findings[:3]
     insights = [
         InsightCard(
-            insight_id=f"IN-{idx:03d}",
-            claim=(
-                f"{finding.finding_id} is a {finding.severity.lower()} audit risk because "
-                f"{finding.why_broken}"
-            ),
-            evidence_refs=[f"{ev.source_file}:{ev.row_number}" for ev in finding.evidence],
-            confidence=finding.confidence,
-            caveats=[
-                "Finding uses evidence pointers, not full raw rows in Cognee.",
-                "Manual confirmation is required before production data is changed.",
-            ],
-            status="candidate",
+            insight_id=str(item.get("insight_id", f"IN-{idx:03d}")),
+            claim=str(item.get("claim", "")),
+            evidence_refs=[str(ref) for ref in item.get("evidence_refs", [])],
+            confidence=float(item.get("confidence", 0.78)),
+            caveats=[str(ref) for ref in item.get("caveats", [])],
         )
-        for idx, finding in enumerate(top, start=1)
+        for idx, item in enumerate(insight_items(result.data.get("insights", [])), start=1)
     ]
-    for insight in insights:
-        await memory.remember_card(insight, "insights", agent)
-    report = generate_pdf(findings, patches)
-    await memory.remember_card(report, "reports", agent)
-    outcome = AgentOutcomeCard(
-        agent=agent,
-        task="Generate evidence-backed executive summary and downloadable PDF from accepted memory cards.",
-        read_datasets=["sources", "schema", "findings", "baselines", "reconciliation", "memory_patches", "agent_outcomes"],
-        wrote_datasets=["insights", "reports", "agent_outcomes"],
-        outcome=f"Generated report {report.report_id} with readiness score {report.readiness_score}.",
-        reason="Agent 4 recalled prior agent handoffs and generated a signable narrative instead of reprocessing raw CSV.",
-        evidence_refs=[finding.finding_id for finding in top],
-        memory_reads=1,
-        memory_writes=len(insights) + 1,
+    narrative = dict_value(result.data.get("report_narrative", {}))
+    report = generate_pdf(
+        sorted(findings, key=lambda item: item.risk_score, reverse=True),
+        patches,
+        narrative_summary=str(narrative.get("executive_summary", "")),
+        narrative_open_risks=[str(item) for item in narrative.get("open_risks", [])],
     )
-    await memory.remember_card(outcome, "agent_outcomes", agent)
-    return insights, report, [outcome]
+    outcome = outcome_from_agent(dict_value(result.data.get("outcome", {})), agent, ["findings", "baselines", "reconciliation", "memory_patches", "agent_outcomes"], ["insights", "reports", "agent_outcomes", "prompt_traces"])
+    await remember_many(memory, insights, "insights", agent, session_id, shared_session_id)
+    await memory.remember_card(report, "reports", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await memory.remember_card(outcome, "agent_outcomes", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await remember_trace(memory, result.trace, agent, session_id, shared_session_id)
+    return insights, report, [outcome], [result.trace]
 
 
-async def run_ui_feedback_agent(memory: MemoryRecorder, run: AuditRun, feedback: str = "") -> list[AgentOutcomeCard]:
+async def run_ui_feedback_agent(
+    memory: MemoryRecorder,
+    llm: GptAgentClient,
+    run: AuditRun,
+    sessions: dict[str, str],
+    feedback: str = "",
+) -> tuple[FeedbackDigestCard, list[AgentOutcomeCard], list[AgentPromptTraceCard]]:
     agent = AGENT_5
-    await memory.recall(
-        "Render memory timeline, agent outcomes, memory patches, insights, and user feedback for the demo UI.",
-        ["agent_outcomes", "memory_patches", "insights", "user_feedback"],
+    session_id = sessions["ui"]
+    shared_session_id = sessions["shared"]
+    outcomes = await memory.recall_cards("Recall all agent outcomes for UI timeline digest.", ["agent_outcomes"], agent, (AgentOutcomeCard,), top_k=80, session_id=shared_session_id, required=True)
+    insights = await memory.recall_cards("Recall insights for UI digest.", ["insights"], agent, (InsightCard,), top_k=30, session_id=shared_session_id)
+    result = await llm.run_json(
         agent,
+        "You are Agent 5, the UI demo and feedback agent. Summarize memory timeline health and what a compliance officer should do next.",
+        {
+            "agent_setting": {"role": agent, "goal": "make the multi-agent handoff inspectable"},
+            "recalled_outcomes": [card_dict(item) for item in outcomes],
+            "recalled_insights": [card_dict(item) for item in insights],
+            "memory_event_count": len(memory.events),
+            "explicit_user_feedback": feedback,
+            "output_contract": "Return feedback_digest and outcome.",
+        },
+        FEEDBACK_SCHEMA,
+        ["agent_outcomes", "memory_patches", "insights", "user_feedback"],
+        ["feedback_digests", "agent_outcomes", "prompt_traces"],
     )
-    outcome = AgentOutcomeCard(
-        agent=agent,
-        task="Expose the handoff timeline and collect compliance officer feedback without writing ordinary UI clicks to memory.",
-        read_datasets=["agent_outcomes", "memory_patches", "insights", "user_feedback"],
-        wrote_datasets=["agent_outcomes"] + (["user_feedback"] if feedback else []),
-        outcome="Memory timeline and evidence drill-down are available in the Streamlit interface.",
-        reason="The UI agent makes Cognee handoff inspectable and only promotes explicit user feedback.",
-        evidence_refs=[event.get("dataset", "") for event in run.memory_events[:5]],
-        memory_reads=1,
-        memory_writes=1,
+    digest_data = dict_value(result.data.get("feedback_digest", {}))
+    digest = FeedbackDigestCard(
+        digest_id=str(digest_data.get("digest_id", "FD-001")),
+        summary=str(digest_data.get("summary", "")),
+        recommended_next_action=str(digest_data.get("recommended_next_action", "")),
+        memory_timeline_health=str(digest_data.get("memory_timeline_health", "")),
+        evidence_refs=[str(ref) for ref in digest_data.get("evidence_refs", [])],
     )
-    await memory.remember_card(outcome, "agent_outcomes", agent)
-    return [outcome]
+    outcome = outcome_from_agent(dict_value(result.data.get("outcome", {})), agent, ["agent_outcomes", "memory_patches", "insights", "user_feedback"], ["feedback_digests", "agent_outcomes", "prompt_traces"])
+    await memory.remember_card(digest, "feedback_digests", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await memory.remember_card(outcome, "agent_outcomes", agent, session_id=session_id, shared_session_id=shared_session_id)
+    await remember_trace(memory, result.trace, agent, session_id, shared_session_id)
+    return digest, [outcome], [result.trace]
 
 
 async def run_audit_pipeline(data_dir: Path, use_cognee: bool = True) -> AuditRun:
     run_id = new_run_id()
     sessions = build_sessions(run_id)
     memory = MemoryRecorder(enabled=use_cognee)
+    llm = GptAgentClient()
     run = AuditRun(
         project_id=PROJECT_ID,
         run_id=run_id,
@@ -585,29 +816,36 @@ async def run_audit_pipeline(data_dir: Path, use_cognee: bool = True) -> AuditRu
         agent_sessions={key: value for key, value in sessions.items() if key != "shared"},
         cognee_enabled=use_cognee,
     )
-    tables, findings, outcomes = await run_data_detective(memory, data_dir)
+    tables, candidates, findings, outcomes, traces = await run_data_detective(memory, llm, data_dir, sessions)
     run.data_sources = [table.source_card for table in tables]
     run.schemas = [table.schema_card for table in tables]
+    run.candidates = candidates
     run.findings = findings
     run.outcomes.extend(outcomes)
+    run.prompt_traces.extend(traces)
 
-    ranked, baselines, outcomes = await run_risk_prioritizer(memory, run.findings)
+    ranked, baselines, outcomes, traces = await run_risk_prioritizer(memory, llm, sessions)
     run.findings = ranked
     run.baselines = baselines
     run.outcomes.extend(outcomes)
+    run.prompt_traces.extend(traces)
 
-    planned, decisions, outcomes = await run_remediation_planner(memory, run.findings)
+    planned, decisions, outcomes, traces = await run_remediation_planner(memory, llm, sessions)
     run.findings = sorted(planned, key=lambda item: item.risk_score, reverse=True)
     run.decisions = decisions
     run.outcomes.extend(outcomes)
+    run.prompt_traces.extend(traces)
 
-    insights, report, outcomes = await run_audit_narrator(memory, run.findings, run.patches)
+    insights, report, outcomes, traces = await run_audit_narrator(memory, llm, sessions, run.patches)
     run.insights = insights
     run.report = report
     run.outcomes.extend(outcomes)
+    run.prompt_traces.extend(traces)
 
-    outcomes = await run_ui_feedback_agent(memory, run)
+    digest, outcomes, traces = await run_ui_feedback_agent(memory, llm, run, sessions)
+    run.feedback_digest = digest
     run.outcomes.extend(outcomes)
+    run.prompt_traces.extend(traces)
 
     run.memory_events = [event.__dict__ for event in memory.events]
     run.cognee_errors = memory.errors

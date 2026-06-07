@@ -50,11 +50,19 @@ Run the Audit Passport web MVP:
 
 ```powershell
 uv pip install -e .
-python -m src.audit_passport.export_web_data
-python -m http.server 5173 -d web
+python -m src.audit_passport.web_server
 ```
 
-Then open `http://localhost:5173`.
+Then open `http://127.0.0.1:5173`. The `Start demo` button calls the live
+`/api/run` endpoint, which runs the GPT + Cognee five-agent pipeline and then
+refreshes the web data. If you only use `python -m http.server`, the page can
+show saved JSON but cannot run agents from the button.
+
+To pre-generate static JSON without serving the live API:
+
+```powershell
+python -m src.audit_passport.export_web_data --use-cognee
+```
 
 The older Streamlit prototype remains in `app.py`, but the primary product
 front end is now the standalone web app under `web/`.

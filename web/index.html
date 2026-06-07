@@ -7,112 +7,176 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand-mark">✓</div>
-        <div>
-          <p class="eyebrow">Audit Passport</p>
-          <h1>Audit Passport</h1>
-          <p class="sidebar-copy">
-            Finds risky records, shows what matters, and tells the team what to do next.
-          </p>
+    <div class="app">
+      <section class="hero">
+        <div class="hero-l">
+          <p class="label kicker-rule">Audit Operations · Data Rescue</p>
+          <h1 class="masthead">Audit Passport<br />Command Center</h1>
+          <div class="badge-row">
+            <span class="badge badge-live"><span class="dot"></span>Cognee armed</span>
+            <span class="badge badge-llm">Narrative LLM</span>
+            <span class="badge badge-ghost" id="sourceMeta">Waiting for agent run</span>
+          </div>
         </div>
 
-        <div class="control-stack">
-          <button class="primary-action" id="runAgentsBtn" type="button">Start demo</button>
-          <button class="secondary-action" id="rippleBtn" type="button" disabled>Add new evidence</button>
-          <button class="ghost-action" id="downloadReportBtn" type="button" disabled>Download brief</button>
+        <div class="hero-r">
+          <div class="control-stack">
+            <button class="btn btn-crisis" id="runAgentsBtn" type="button">▶ Start demo</button>
+            <button class="btn" id="rippleBtn" type="button" disabled>Add new evidence</button>
+            <button class="btn btn-ghost" id="downloadReportBtn" type="button" disabled>Download brief</button>
+          </div>
         </div>
+      </section>
 
-        <div class="source-panel">
-          <span class="panel-label">Demo data</span>
-          <strong>Warehouse records</strong>
-          <small id="sourceMeta">Waiting for agent run</small>
-        </div>
-      </aside>
+      <hr class="hr-double" />
 
-      <main>
-        <section class="hero" id="readiness">
-          <div class="hero-copy">
-            <p class="eyebrow">Before the audit</p>
-            <h2>Can we trust these records?</h2>
-            <p>
-              The demo checks the file, finds the biggest risks, and turns them into a short action list.
+      <section class="brief-grid" id="readiness">
+        <div class="narrative brief-card">
+          <div class="card-bd">
+            <p class="label">Crisis state</p>
+            <h2>Can we trust these warehouse records before sign-off?</h2>
+            <p id="executiveSummary" class="narrative-body dropcap">
+              Start the demo to find the risky records, prove why they matter, and generate the next action.
             </p>
           </div>
-          <div class="readiness-card">
+        </div>
+
+        <div class="blackbox ready-box">
+          <div class="blackbox-hd">
+            <span class="panel-title">Ready Chance</span>
+            <span class="badge badge-armed">Probabilistic</span>
+          </div>
+          <div class="ready-body">
             <div class="score-ring" id="scoreRing">--</div>
-            <span>PyMC ready probability</span>
-            <small id="readyInterval">Run not started</small>
-            <small id="runId">No posterior yet</small>
-          </div>
-        </section>
-
-        <section class="metric-grid" aria-label="Audit metrics">
-          <article>
-            <span>Urgent issues</span>
-            <strong id="criticalMetric">0</strong>
-          </article>
-          <article>
-            <span>Total issues</span>
-            <strong id="findingsMetric">0</strong>
-          </article>
-          <article>
-            <span>Can fix now</span>
-            <strong id="readyMetric">0</strong>
-          </article>
-          <article>
-            <span>New facts</span>
-            <strong id="patchMetric">0</strong>
-          </article>
-        </section>
-
-        <section class="stage-section" id="handoff">
-          <div class="section-heading">
-            <p class="eyebrow">How it works</p>
-            <h2>Five simple steps</h2>
-          </div>
-          <div class="stage-grid" id="stageGrid"></div>
-        </section>
-
-        <section class="workbench">
-          <div class="queue-panel" id="queue">
-            <div class="section-heading compact">
-              <p class="eyebrow">Action list</p>
-              <h2>What needs attention</h2>
+            <div>
+              <strong id="readyInterval">Run not started</strong>
+              <small id="runId">Waiting for agent handoff</small>
             </div>
-            <div class="passport-list" id="passportList">
+          </div>
+        </div>
+      </section>
+
+      <section class="metric-row" aria-label="Audit metrics">
+        <article class="metric is-crisis">
+          <span class="label metric-k">Urgent issues</span>
+          <strong class="metric-v" id="criticalMetric">0</strong>
+          <span class="metric-foot">must clear before review</span>
+        </article>
+        <article class="metric">
+          <span class="label metric-k">Total findings</span>
+          <strong class="metric-v" id="findingsMetric">0</strong>
+          <span class="metric-foot">evidence-backed passports</span>
+        </article>
+        <article class="metric is-cool">
+          <span class="label metric-k">Can fix now</span>
+          <strong class="metric-v" id="readyMetric">0</strong>
+          <span class="metric-foot">safe or suggested actions</span>
+        </article>
+        <article class="metric is-watch">
+          <span class="label metric-k">New facts</span>
+          <strong class="metric-v" id="patchMetric">0</strong>
+          <span class="metric-foot">memory patches applied</span>
+        </article>
+      </section>
+
+      <section class="card pipeline-card" id="handoff">
+        <div class="card-hd">
+          <span class="panel-title"><span class="seq">01</span> Five-agent handoff map</span>
+          <span class="label">Memory reads and writes stay inspectable</span>
+        </div>
+        <div class="card-bd">
+          <div class="pipeline" id="stageGrid"></div>
+        </div>
+      </section>
+
+      <section class="body-grid">
+        <aside class="stack gap4">
+          <div class="card card-accent-top">
+            <div class="card-hd">
+              <span class="panel-title"><span class="seq">02</span> Quality issue categories</span>
+            </div>
+            <div class="card-bd stack gap3" id="qualityAlerts">
+              <div class="qalert is-watch">
+                <span class="q-ic">?</span>
+                <div>
+                  <div class="q-t">Awaiting triage</div>
+                  <div class="q-d">Start the demo to generate audit findings.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <span class="panel-title"><span class="seq">03</span> Review progress</span>
+            </div>
+            <div class="card-bd" id="actionSummary">
+              <div class="empty-state">Pick a risk row after starting the demo.</div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="stack gap5">
+          <section class="card" id="queue">
+            <div class="card-hd">
+              <span class="panel-title"><span class="seq">04</span> Risk order & repair choices</span>
+              <span class="label">Drag to set your risk ranking</span>
+            </div>
+            <div class="card-bd table-wrap" id="passportList">
               <div class="empty-state">Start the demo to see the risk list.</div>
             </div>
-          </div>
+          </section>
 
-          <div class="detail-panel" id="detail">
-            <div class="section-heading compact">
-              <p class="eyebrow">Selected issue</p>
-              <h2 id="detailTitle">Nothing selected yet</h2>
+          <section class="card evidence-card" id="detail">
+            <div class="card-hd">
+              <span class="panel-title"><span class="seq">05</span> Evidence drill-down</span>
+              <span class="label" id="detailTitle">Nothing selected yet</span>
             </div>
-            <div id="passportDetail" class="detail-body">
-              Pick an issue from the list after starting the demo.
+            <div id="passportDetail" class="card-bd detail-body">
+              Pick an issue from the risk table after starting the demo.
             </div>
-          </div>
-        </section>
+          </section>
+        </main>
 
-        <section class="ripple-section">
-          <div class="ripple-card">
+      </section>
+
+      <section class="card evidence-card action-panel" id="final-plan">
+        <div class="card-hd">
+          <span class="panel-title"><span class="seq">06</span> Final repair plan</span>
+          <span class="label">User decisions become the handoff</span>
+        </div>
+        <div class="card-bd detail-body action-body">
+          <div class="detail-summary final-summary" id="finalSummary">
             <div>
-              <p class="eyebrow">New evidence</p>
-              <h2>When new facts arrive, the recommendation changes.</h2>
-              <p id="rippleSummary">
-                After the first run, add new evidence to see one issue become less risky.
-              </p>
+              <span>Decided</span>
+              <strong>0 / 0 records</strong>
             </div>
-            <div class="diff-card" id="diffCard">
-              <span>Before and after will appear here.</span>
+            <div>
+              <span>Adopted</span>
+              <strong>0 recommendations</strong>
+            </div>
+            <div>
+              <span>Custom</span>
+              <strong>0 repair plans</strong>
             </div>
           </div>
-        </section>
-      </main>
+          <div class="detail-block">
+            <h3>Repair handoff</h3>
+            <p id="rippleSummary">
+              Adopt or reject record-level recommendations to build a final remediation plan.
+            </p>
+          </div>
+          <div class="detail-block evidence-preview">
+            <h3>Final choices</h3>
+            <div class="evidence-grid final-decision-list" id="diffCard">
+              <div class="empty-state">Final choices will appear here.</div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
+
+    <div class="dialog-root" id="rejectDialog" aria-hidden="true"></div>
 
     <script src="./app.js"></script>
   </body>

@@ -7,6 +7,8 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "cognee==1.1.2",
     "fpdf2>=2.7.9",
+    "matplotlib>=3.8.0",
+    "openai>=2.16.0",
     "pandas>=2.2.2",
     "pymc>=5.16.0",
     "pymupdf>=1.27.2",
@@ -16,6 +18,7 @@ dependencies = [
 
 [project.scripts]
 cognee-memory = "src.cognee_memory:main"
+audit-passport-web = "src.audit_passport.web_server:main"
 
 [build-system]
 requires = ["setuptools>=68"]

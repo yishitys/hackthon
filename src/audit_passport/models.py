@@ -53,6 +53,19 @@ class SchemaCard:
 
 
 @dataclass
+class DetectionCandidateCard:
+    candidate_id: str
+    source_id: str
+    candidate_type: str
+    affected_entity: str
+    detector_reason: str
+    suggested_risk_score: int
+    evidence: list[Evidence]
+    status: str = "candidate"
+    type: str = "DetectionCandidateCard"
+
+
+@dataclass
 class FindingCard:
     finding_id: str
     type: str
@@ -166,6 +179,22 @@ class AgentOutcomeCard:
 
 
 @dataclass
+class AgentPromptTraceCard:
+    trace_id: str
+    agent: str
+    model: str
+    prompt_version: str
+    input_summary: str
+    output_validation_status: str
+    recalled_datasets: list[str]
+    wrote_datasets: list[str]
+    response_id: str = ""
+    status: str = "active"
+    written_at: str = field(default_factory=utc_now)
+    type: str = "AgentPromptTrace"
+
+
+@dataclass
 class UserFeedbackCard:
     finding_id: str
     feedback: str
@@ -173,6 +202,18 @@ class UserFeedbackCard:
     status: str = "active"
     written_at: str = field(default_factory=utc_now)
     type: str = "UserFeedback"
+
+
+@dataclass
+class FeedbackDigestCard:
+    digest_id: str
+    summary: str
+    recommended_next_action: str
+    memory_timeline_health: str
+    evidence_refs: list[str]
+    status: str = "active"
+    written_at: str = field(default_factory=utc_now)
+    type: str = "FeedbackDigest"
 
 
 @dataclass
@@ -186,10 +227,13 @@ class AuditRun:
     findings: list[FindingCard] = field(default_factory=list)
     baselines: list[ClassificationBaselineCard] = field(default_factory=list)
     decisions: list[ReconciliationDecisionCard] = field(default_factory=list)
+    candidates: list[DetectionCandidateCard] = field(default_factory=list)
     patches: list[MemoryPatch] = field(default_factory=list)
     insights: list[InsightCard] = field(default_factory=list)
     report: AuditReportCard | None = None
     outcomes: list[AgentOutcomeCard] = field(default_factory=list)
+    prompt_traces: list[AgentPromptTraceCard] = field(default_factory=list)
+    feedback_digest: FeedbackDigestCard | None = None
     memory_events: list[dict[str, Any]] = field(default_factory=list)
     cognee_enabled: bool = True
     cognee_errors: list[str] = field(default_factory=list)
@@ -220,11 +264,14 @@ def card_to_markdown(card: Any) -> str:
     identity = (
         data.get("finding_id")
         or data.get("source_id")
+        or data.get("candidate_id")
         or data.get("baseline_id")
         or data.get("decision_id")
         or data.get("patch_id")
         or data.get("insight_id")
         or data.get("report_id")
+        or data.get("trace_id")
+        or data.get("digest_id")
         or data.get("agent")
         or "memory-card"
     )

@@ -60,32 +60,41 @@ def run_to_payload(run: Any) -> dict[str, Any]:
     return payload
 
 
-async def export_web_data(use_cognee: bool = False, output_dir: Path = WEB_DATA_DIR) -> None:
+async def export_web_data(
+    use_cognee: bool = False,
+    output_dir: Path = WEB_DATA_DIR,
+    include_ripple: bool = True,
+) -> dict[str, dict[str, Any] | None]:
     output_dir.mkdir(parents=True, exist_ok=True)
     initial_run = await run_audit_pipeline(DATA_DIR, use_cognee=use_cognee)
     initial_payload = run_to_payload(initial_run)
-    ripple_run = await apply_memory_ripple(initial_run, use_cognee=use_cognee)
-    ripple_payload = run_to_payload(ripple_run)
 
     (output_dir / "audit_run.json").write_text(
         json.dumps(initial_payload, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    (output_dir / "audit_ripple.json").write_text(
-        json.dumps(ripple_payload, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    pdf_path = Path(ripple_payload.get("report", {}).get("pdf_path", ""))
+    ripple_payload = None
+    if include_ripple:
+        ripple_run = await apply_memory_ripple(initial_run, use_cognee=use_cognee)
+        ripple_payload = run_to_payload(ripple_run)
+        (output_dir / "audit_ripple.json").write_text(
+            json.dumps(ripple_payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    pdf_source = ripple_payload or initial_payload
+    pdf_path = Path(pdf_source.get("report", {}).get("pdf_path", ""))
     if pdf_path.exists():
         shutil.copy2(pdf_path, output_dir / "audit_passport_summary.pdf")
+    return {"initial": initial_payload, "ripple": ripple_payload}
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Export Audit Passport web frontend data.")
     parser.add_argument("--use-cognee", action="store_true", help="Write semantic cards to Cognee while exporting.")
     parser.add_argument("--output-dir", type=Path, default=WEB_DATA_DIR)
+    parser.add_argument("--no-ripple", action="store_true", help="Export only the initial five-agent run.")
     args = parser.parse_args()
-    asyncio.run(export_web_data(use_cognee=args.use_cognee, output_dir=args.output_dir))
+    asyncio.run(export_web_data(use_cognee=args.use_cognee, output_dir=args.output_dir, include_ripple=not args.no_ripple))
 
 
 if __name__ == "__main__":

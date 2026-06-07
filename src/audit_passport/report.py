@@ -9,6 +9,17 @@ from .probabilistic import score_readiness_with_pymc
 
 
 ARTIFACT_DIR = Path("runtime/artifacts")
+PDF_TEXT_REPLACEMENTS = {
+    "\u2018": "'",
+    "\u2019": "'",
+    "\u201c": '"',
+    "\u201d": '"',
+    "\u2013": "-",
+    "\u2014": "-",
+    "\u2022": "-",
+    "\u2026": "...",
+    "\u00a0": " ",
+}
 
 
 def readiness_score(findings: list[FindingCard]) -> int:
@@ -18,7 +29,9 @@ def readiness_score(findings: list[FindingCard]) -> int:
     return max(0, min(100, 100 - int(penalty / 8)))
 
 
-def executive_summary(findings: list[FindingCard], patches: list[MemoryPatch]) -> str:
+def executive_summary(findings: list[FindingCard], patches: list[MemoryPatch], override: str = "") -> str:
+    if override:
+        return override
     critical = [item for item in findings if item.severity in {"Critical", "High"}]
     if not findings:
         return "No audit blockers were detected in the current Kaggle data snapshot."
@@ -30,7 +43,13 @@ def executive_summary(findings: list[FindingCard], patches: list[MemoryPatch]) -
     )
 
 
-def build_report_card(findings: list[FindingCard], patches: list[MemoryPatch], pdf_path: Path) -> AuditReportCard:
+def build_report_card(
+    findings: list[FindingCard],
+    patches: list[MemoryPatch],
+    pdf_path: Path,
+    narrative_summary: str = "",
+    narrative_open_risks: list[str] | None = None,
+) -> AuditReportCard:
     score = readiness_score(findings)
     readiness = score_readiness_with_pymc(findings, patch_count=len(patches))
     critical = [finding.finding_id for finding in findings if finding.severity in {"Critical", "High"}]
@@ -48,23 +67,35 @@ def build_report_card(findings: list[FindingCard], patches: list[MemoryPatch], p
         readiness_uncertainty=readiness.uncertainty_level,
         readiness_reason=readiness.reason,
         readiness_method=readiness.method,
-        executive_summary=executive_summary(findings, patches),
+        executive_summary=executive_summary(findings, patches, narrative_summary),
         critical_findings=critical,
         ripple_updates=[patch.patch_id for patch in patches],
-        open_risks=open_risks,
+        open_risks=narrative_open_risks or open_risks,
         pdf_path=str(pdf_path).replace("\\", "/"),
     )
 
 
+def pdf_safe_text(text: object) -> str:
+    safe = str(text)
+    for source, replacement in PDF_TEXT_REPLACEMENTS.items():
+        safe = safe.replace(source, replacement)
+    return safe.encode("latin-1", errors="replace").decode("latin-1")
+
+
 def write_line(pdf: FPDF, text: str, height: int = 5) -> None:
     pdf.set_x(pdf.l_margin)
-    pdf.multi_cell(0, height, str(text), new_x="LMARGIN", new_y="NEXT")
+    pdf.multi_cell(0, height, pdf_safe_text(text), new_x="LMARGIN", new_y="NEXT")
 
 
-def generate_pdf(findings: list[FindingCard], patches: list[MemoryPatch]) -> AuditReportCard:
+def generate_pdf(
+    findings: list[FindingCard],
+    patches: list[MemoryPatch],
+    narrative_summary: str = "",
+    narrative_open_risks: list[str] | None = None,
+) -> AuditReportCard:
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     path = ARTIFACT_DIR / "audit_passport_summary.pdf"
-    report = build_report_card(findings, patches, path)
+    report = build_report_card(findings, patches, path, narrative_summary, narrative_open_risks)
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=14)

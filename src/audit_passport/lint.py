@@ -7,6 +7,7 @@ from typing import Any
 PROMOTABLE_TYPES = {
     "DataSourceCard",
     "SchemaCard",
+    "DetectionCandidateCard",
     "FindingCard",
     "ClassificationBaseline",
     "ReconciliationDecision",
@@ -14,7 +15,9 @@ PROMOTABLE_TYPES = {
     "InsightCard",
     "AuditReportCard",
     "AgentOutcome",
+    "AgentPromptTrace",
     "UserFeedback",
+    "FeedbackDigest",
 }
 
 
@@ -28,6 +31,8 @@ def lint_card(card: Any) -> tuple[bool, str]:
         return False, "secret-like key detected"
     if card_type == "FindingCard" and not data.get("evidence"):
         return False, "finding lacks evidence pointer"
+    if card_type == "DetectionCandidateCard" and not data.get("evidence"):
+        return False, "candidate lacks evidence pointer"
     if card_type in {"DataSourceCard", "SchemaCard"} and not data.get("source_id"):
         return False, "source card lacks source_id"
     if data.get("status") in {"rejected", "expired"}:
