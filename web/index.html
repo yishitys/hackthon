@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Audit Passport</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-mark">AP</div>
+        <div>
+          <p class="eyebrow">Forensic Passport System</p>
+          <h1>Audit Passport</h1>
+          <p class="sidebar-copy">
+            A five-agent audit desk for rescuing corrupted manufacturing data before regulatory review.
+          </p>
+        </div>
+
+        <div class="control-stack">
+          <button class="primary-action" id="runAgentsBtn" type="button">Run audit agents</button>
+          <button class="secondary-action" id="rippleBtn" type="button" disabled>New evidence found</button>
+          <button class="ghost-action" id="downloadReportBtn" type="button" disabled>Download report brief</button>
+        </div>
+
+        <div class="source-panel">
+          <span class="panel-label">Kaggle source</span>
+          <strong>Track 01 Data Rescue</strong>
+          <small id="sourceMeta">Waiting for agent run</small>
+        </div>
+
+        <nav class="rail-nav" aria-label="Audit Passport sections">
+          <a href="#readiness">Readiness</a>
+          <a href="#handoff">Agent handoff</a>
+          <a href="#queue">Passport queue</a>
+          <a href="#detail">Evidence detail</a>
+        </nav>
+      </aside>
+
+      <main>
+        <section class="hero" id="readiness">
+          <div class="hero-copy">
+            <p class="eyebrow">Four days before audit</p>
+            <h2>Turn corrupted warehouse records into signable evidence passports.</h2>
+            <p>
+              Raw CSV rows stay outside Cognee. The system remembers reusable semantics:
+              source profiles, schema, findings, baselines, decisions, patches, outcomes, and feedback.
+            </p>
+          </div>
+          <div class="readiness-card">
+            <div class="score-ring" id="scoreRing">--</div>
+            <span>Audit readiness</span>
+            <small id="runId">Run not started</small>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="Audit metrics">
+          <article>
+            <span>Critical blockers</span>
+            <strong id="criticalMetric">0</strong>
+          </article>
+          <article>
+            <span>Findings found</span>
+            <strong id="findingsMetric">0</strong>
+          </article>
+          <article>
+            <span>Ready to sign</span>
+            <strong id="readyMetric">0</strong>
+          </article>
+          <article>
+            <span>Memory patches</span>
+            <strong id="patchMetric">0</strong>
+          </article>
+        </section>
+
+        <section class="stage-section" id="handoff">
+          <div class="section-heading">
+            <p class="eyebrow">Cognee semantic memory</p>
+            <h2>Five-agent handoff map</h2>
+          </div>
+          <div class="stage-grid" id="stageGrid"></div>
+        </section>
+
+        <section class="workbench">
+          <div class="queue-panel" id="queue">
+            <div class="section-heading compact">
+              <p class="eyebrow">Risk queue</p>
+              <h2>Audit passports</h2>
+            </div>
+            <div class="passport-list" id="passportList">
+              <div class="empty-state">Run the agents to generate evidence-backed passports.</div>
+            </div>
+          </div>
+
+          <div class="detail-panel" id="detail">
+            <div class="section-heading compact">
+              <p class="eyebrow">Evidence detail</p>
+              <h2 id="detailTitle">No passport selected</h2>
+            </div>
+            <div id="passportDetail" class="detail-body">
+              Select a passport after running the agents.
+            </div>
+          </div>
+        </section>
+
+        <section class="ripple-section">
+          <div class="ripple-card">
+            <div>
+              <p class="eyebrow">Memory Ripple</p>
+              <h2>One memory update changes the whole audit story.</h2>
+              <p id="rippleSummary">
+                Click New evidence found after the first run to apply a Memory Patch and refresh risk, action, and report language.
+              </p>
+            </div>
+            <div class="diff-card" id="diffCard">
+              <span>Before / after appears here</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="timeline-section">
+          <div class="section-heading compact">
+            <p class="eyebrow">Inspectable proof</p>
+            <h2>Memory timeline</h2>
+          </div>
+          <div class="timeline" id="memoryTimeline">
+            <div class="empty-state">No memory events yet.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+

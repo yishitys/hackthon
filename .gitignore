@@ -1,0 +1,10 @@
+.venv/
+.env
+.cognee/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+runtime/
+data/kaggle/*.csv
+*.egg-info/

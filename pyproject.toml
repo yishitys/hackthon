@@ -1,0 +1,28 @@
+[project]
+name = "hackathon-cognee-memory"
+version = "0.1.0"
+description = "Cognee memory layer scaffold for a hackathon multi-agent system."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "cognee==1.1.2",
+    "fpdf2>=2.7.9",
+    "pandas>=2.2.2",
+    "pymupdf>=1.27.2",
+    "python-dotenv>=1.0.1",
+    "streamlit>=1.36.0",
+]
+
+[project.scripts]
+cognee-memory = "src.cognee_memory:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.uv]
+package = true
