@@ -18,6 +18,8 @@ const state = {
   userRiskOrder: [],
   remediationDecisions: {},
   rejectDraft: null,
+  planSubmitted: false,
+  submittedSummary: null,
 };
 
 const stages = [
@@ -351,6 +353,8 @@ function resetUserReviewState() {
   state.userRiskOrder = [];
   state.remediationDecisions = {};
   state.rejectDraft = null;
+  state.planSubmitted = false;
+  state.submittedSummary = null;
 }
 
 function outcomeForStage(run, stage) {
@@ -666,6 +670,7 @@ function renderDetail(run) {
         status: "accepted",
         plan: recommendedRepairText(finding, evidence),
       };
+      state.planSubmitted = false;
       render();
     });
   });
@@ -798,15 +803,37 @@ function renderRejectDialog() {
     }
     state.remediationDecisions[draft.key] = { status: "rejected", plan };
     state.rejectDraft = null;
+    state.planSubmitted = false;
     render();
   });
   $("customRepair").focus();
+}
+
+function renderSubmitControl(run, stats) {
+  const button = $("submitPlanBtn");
+  const status = $("submitStatus");
+  if (!button || !status) return;
+  const hasDecisions = stats.decided > 0;
+  button.disabled = !hasDecisions || state.planSubmitted;
+  button.textContent = state.planSubmitted ? "Plan submitted ✓" : "Submit repair plan";
+  if (state.planSubmitted && state.submittedSummary) {
+    const s = state.submittedSummary;
+    status.textContent = `Submitted ${s.decided} decisions (${s.accepted} adopted, ${s.rejected} custom) for handoff.`;
+    status.classList.add("is-submitted");
+  } else if (!hasDecisions) {
+    status.textContent = "Decide on at least one record to submit the repair plan.";
+    status.classList.remove("is-submitted");
+  } else {
+    status.textContent = `Ready to submit: ${stats.decided} of ${stats.total} records decided.`;
+    status.classList.remove("is-submitted");
+  }
 }
 
 function renderFinalRepairPlan(run) {
   const stats = decisionStats(run);
   const rows = finalDecisionRows(run);
   const patch = (run?.patches || []).at(-1);
+  renderSubmitControl(run, stats);
   $("finalSummary").innerHTML = `
     <div>
       <span>Decided</span>
@@ -988,6 +1015,20 @@ async function init() {
   });
 
   $("downloadReportBtn").addEventListener("click", downloadReportBrief);
+
+  $("submitPlanBtn").addEventListener("click", () => {
+    const stats = decisionStats(state.activeRun);
+    if (!stats.decided) return;
+    state.planSubmitted = true;
+    state.submittedSummary = {
+      decided: stats.decided,
+      accepted: stats.accepted,
+      rejected: stats.rejected,
+      total: stats.total,
+    };
+    render();
+    location.hash = "#final-plan";
+  });
 }
 
 init();
