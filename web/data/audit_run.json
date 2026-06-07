@@ -1,13 +1,13 @@
 {
   "project_id": "audit_passport",
-  "run_id": "run-20260607191109",
-  "shared_session_id": "ap:audit_passport:run-20260607191109:shared",
+  "run_id": "run-20260607201830",
+  "shared_session_id": "ap:audit_passport:run-20260607201830:shared",
   "agent_sessions": {
-    "ingest": "ap:audit_passport:run-20260607191109:ingest",
-    "classify": "ap:audit_passport:run-20260607191109:classify",
-    "reconcile": "ap:audit_passport:run-20260607191109:reconcile",
-    "narrative": "ap:audit_passport:run-20260607191109:narrative",
-    "ui": "ap:audit_passport:run-20260607191109:ui"
+    "ingest": "ap:audit_passport:run-20260607201830:ingest",
+    "classify": "ap:audit_passport:run-20260607201830:classify",
+    "reconcile": "ap:audit_passport:run-20260607201830:reconcile",
+    "narrative": "ap:audit_passport:run-20260607201830:narrative",
+    "ui": "ap:audit_passport:run-20260607201830:ui"
   },
   "data_sources": [
     {
@@ -104,10 +104,10 @@
   "findings": [
     {
       "finding_id": "F-DC-002",
-      "type": "Audit finding",
+      "type": "FindingCard",
       "severity": "Critical",
       "risk_score": 95,
-      "confidence": 0.83,
+      "confidence": 0.8,
       "affected_entity": "",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
@@ -149,20 +149,20 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Ship date preceding production date is a hard chronology breach that undermines cutoff assertions and traceability (potential revenue recognition and inventory movement timing errors). Strong indicator of systemic data integrity/control breakdown; likely to be treated as an audit blocker until explained and corrected.",
-      "action_rationale": "Ship date preceding production date is a hard chronology breach with direct cutoff/revenue/inventory timing implications. There is no safe deterministic correction without a trusted source-of-truth date lineage (ERP/WMS/BOL).",
+      "ranking_reason": "Ship_date earlier than production_date breaks basic event chronology, indicating potential cut-off/revenue-recognition and traceability failures. Multiple occurrences suggest a systemic control/data pipeline issue rather than a single typo, elevating audit-blocker likelihood.",
+      "action_rationale": "",
       "ripple_note": "",
       "audit_blocker_probability": 0.815,
       "credible_interval_low": 0.653,
       "credible_interval_high": 0.933,
       "uncertainty_level": "medium",
-      "probabilistic_reason": "rule score 95/100; 4 evidence pointers; Audit finding issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 95/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     },
     {
       "finding_id": "F-DC-003",
-      "type": "Audit finding",
+      "type": "FindingCard",
       "severity": "High",
       "risk_score": 90,
       "confidence": 0.8,
@@ -207,23 +207,23 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Negative quantities in manufactured inventory records directly threaten inventory existence/valuation and COGS accuracy (potential material misstatement). Could reflect returns/scrap adjustments, but absent explicit reversal/adjustment semantics this is a high-risk integrity issue requiring prompt reconciliation.",
-      "action_rationale": "Negative quantities may indicate legitimate adjustments (returns/scrap/reversals) versus data corruption. Auto-flipping signs would be non-auditable without transaction-type semantics.",
+      "ranking_reason": "Negative manufactured quantities can directly misstate inventory balances/COGS unless explicitly modeled as returns/adjustments. Without explicit transaction-type fields, auditors will treat these as high-risk data integrity exceptions requiring reconciliation.",
+      "action_rationale": "",
       "ripple_note": "",
       "audit_blocker_probability": 0.786,
       "credible_interval_low": 0.624,
       "credible_interval_high": 0.917,
       "uncertainty_level": "medium",
-      "probabilistic_reason": "rule score 90/100; 4 evidence pointers; Audit finding issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 90/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     },
     {
       "finding_id": "F-DC-005",
-      "type": "Audit finding",
+      "type": "FindingCard",
       "severity": "High",
-      "risk_score": 88,
-      "confidence": 0.78,
+      "risk_score": 87,
+      "confidence": 0.72,
       "affected_entity": "",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
@@ -265,23 +265,23 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Conflicting quantities for the same entity across records indicates reconciliation failure and weak change control/versioning. This can propagate into inventory balances and operational reporting; high likelihood of audit exceptions if not resolved with an authoritative source and effective dedup/version rules.",
-      "action_rationale": "Conflicting quantities for the same entity across records requires identification of the authoritative version (versioning/change control). Without an explicit rule (latest timestamp, status, revision id), automated selection risks misstating inventory.",
+      "ranking_reason": "Conflicting quantities for the 'same entity' (given stated grain: one row per plant_id/part_number) indicates non-deterministic source-of-truth and threatens inventory valuation and operational reporting. Could be legitimate time-variance, but grain mismatch elevates risk pending clarification.",
+      "action_rationale": "",
       "ripple_note": "",
-      "audit_blocker_probability": 0.77,
-      "credible_interval_low": 0.604,
-      "credible_interval_high": 0.904,
+      "audit_blocker_probability": 0.764,
+      "credible_interval_low": 0.596,
+      "credible_interval_high": 0.899,
       "uncertainty_level": "medium",
-      "probabilistic_reason": "rule score 88/100; 4 evidence pointers; Audit finding issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 87/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     },
     {
       "finding_id": "F-DC-001",
-      "type": "Audit finding",
+      "type": "FindingCard",
       "severity": "High",
       "risk_score": 80,
-      "confidence": 0.8,
+      "confidence": 0.82,
       "affected_entity": "",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
@@ -323,23 +323,23 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Customer IDs in transactional/production dataset not present in the customer master indicates master-data control failure (completeness/validity). This can impair revenue/AR attribution, customer due-diligence traceability, and audit trail integrity, but is typically remediable via master reconciliation rather than a direct chronology/valuation violation.",
-      "action_rationale": "Customer IDs referenced in transactions but missing from the customer master indicate master-data completeness/control failure. A controlled master reconciliation can resolve this, but creating customers blindly is not a safe auto-fix.",
+      "ranking_reason": "Customer_id values not found in the customer master indicate broken referential integrity, undermining customer-level reporting, shipment accountability, and any compliance processes relying on customer master governance. Typically remediable, but still material for audit readiness.",
+      "action_rationale": "",
       "ripple_note": "",
       "audit_blocker_probability": 0.719,
       "credible_interval_low": 0.546,
       "credible_interval_high": 0.871,
       "uncertainty_level": "high",
-      "probabilistic_reason": "rule score 80/100; 4 evidence pointers; Audit finding issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 80/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     },
     {
       "finding_id": "F-DC-006",
-      "type": "Audit finding",
+      "type": "FindingCard",
       "severity": "Medium",
-      "risk_score": 70,
-      "confidence": 0.7,
+      "risk_score": 60,
+      "confidence": 0.6,
       "affected_entity": "",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
@@ -381,72 +381,14 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Potential duplicate row signatures imply double-count risk (inventory/throughput). However, source-level summary indicates no duplicate rows overall, so this may be a near-duplicate/signature logic issue; treat as medium pending confirmation of true double-count impact.",
-      "action_rationale": "Potential duplicate row signatures can cause double-counting, but the finding notes possible detection/signature ambiguity. Requires confirmation of true duplicates before any deletion/merge.",
+      "ranking_reason": "Potential duplicate row signatures could double-count production/inspection, but datasource quality summary reports zero duplicate rows, creating evidentiary conflict. Keep medium priority pending verification of the deduplication logic and signature definition.",
+      "action_rationale": "",
       "ripple_note": "",
-      "audit_blocker_probability": 0.659,
-      "credible_interval_low": 0.487,
-      "credible_interval_high": 0.82,
-      "uncertainty_level": "high",
-      "probabilistic_reason": "rule score 70/100; 4 evidence pointers; Audit finding issue prior; multiple evidence pointers narrow uncertainty",
-      "scoring_method": "pymc_beta",
-      "memory_status": "active"
-    },
-    {
-      "finding_id": "F-DC-004",
-      "type": "Audit finding",
-      "severity": "Medium",
-      "risk_score": 62,
-      "confidence": 0.72,
-      "affected_entity": "",
-      "audit_risk": "May weaken audit readiness.",
-      "why_broken": "",
-      "suggested_action": "Pending triage",
-      "status": "open",
-      "evidence": [
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "2",
-          "field_name": "unit",
-          "observed_value": "mm",
-          "expected_or_conflicting_value": "mm",
-          "explanation": "Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation."
-        },
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "3",
-          "field_name": "unit",
-          "observed_value": "mm",
-          "expected_or_conflicting_value": "mm",
-          "explanation": "Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation."
-        },
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "4",
-          "field_name": "unit",
-          "observed_value": "mm",
-          "expected_or_conflicting_value": "mm",
-          "explanation": "Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation."
-        },
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "5",
-          "field_name": "unit",
-          "observed_value": "mm",
-          "expected_or_conflicting_value": "mm",
-          "explanation": "Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation."
-        }
-      ],
-      "created_by_agent": "Data Ingestion & Detective Agent",
-      "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Quantity paired with physical measurement units (e.g., mm) suggests semantic/modeling ambiguity (count vs. measurement). This is primarily a data definition/control design issue; it can lead to aggregation/reporting errors, but the regulatory risk is indirect unless it demonstrably impacts financial metrics.",
-      "action_rationale": "Quantity paired with physical measurement units (e.g., mm) indicates a data-definition/modeling ambiguity (count vs measurement). This is a schema/semantics issue and cannot be safely auto-corrected without business definitions.",
-      "ripple_note": "",
-      "audit_blocker_probability": 0.605,
-      "credible_interval_low": 0.423,
+      "audit_blocker_probability": 0.599,
+      "credible_interval_low": 0.421,
       "credible_interval_high": 0.772,
       "uncertainty_level": "high",
-      "probabilistic_reason": "rule score 62/100; 4 evidence pointers; Audit finding issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 60/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     }
@@ -474,7 +416,7 @@
         "Classification & Risk Prioritizer Agent",
         "Narrative & Audit Report Agent"
       ],
-      "rationale": "",
+      "rationale": "Severity is Critical with multiple occurrences; any 'auto-correction' (swap dates, clamp, or reorder) risks creating fabricated chronology. Requires source-system verification and documented correction to maintain audit defensibility.",
       "status": "active",
       "type": "ReconciliationDecision"
     },
@@ -488,7 +430,7 @@
         "Classification & Risk Prioritizer Agent",
         "Narrative & Audit Report Agent"
       ],
-      "rationale": "",
+      "rationale": "Negative quantities can be valid only under explicit transaction semantics; none are provided. Safe auto-fix (e.g., ABS()) is not auditable and could materially misstate inventory/COGS.",
       "status": "active",
       "type": "ReconciliationDecision"
     },
@@ -502,7 +444,7 @@
         "Classification & Risk Prioritizer Agent",
         "Narrative & Audit Report Agent"
       ],
-      "rationale": "",
+      "rationale": "Referential integrity breaks could stem from incomplete master data or incorrect transactional IDs. Auto-creating/mapping customers changes master data and must follow governance approval.",
       "status": "active",
       "type": "ReconciliationDecision"
     },
@@ -516,7 +458,7 @@
         "Classification & Risk Prioritizer Agent",
         "Narrative & Audit Report Agent"
       ],
-      "rationale": "",
+      "rationale": "Conflicting quantities likely indicate a grain/key design problem or missing dimensions. Any overwrite/aggregation needs an agreed grain and deterministic precedence rules.",
       "status": "active",
       "type": "ReconciliationDecision"
     },
@@ -530,7 +472,7 @@
         "Classification & Risk Prioritizer Agent",
         "Narrative & Audit Report Agent"
       ],
-      "rationale": "",
+      "rationale": "There is a stated conflict between duplicate flags and a zero-duplicate summary. Auto-dedup could delete legitimate events; first reconcile detection logic and business meaning of repeats.",
       "status": "active",
       "type": "ReconciliationDecision"
     },
@@ -544,7 +486,7 @@
         "Classification & Risk Prioritizer Agent",
         "Narrative & Audit Report Agent"
       ],
-      "rationale": "",
+      "rationale": "Unit/semantic ambiguity (quantity paired with 'mm') is moderate risk but likely resolvable via data dictionary/model clarification and possible field renaming or unit standardization; proceed with a controlled specification update rather than record-level edits.",
       "status": "active",
       "type": "ReconciliationDecision"
     }
@@ -819,69 +761,99 @@
   "insights": [
     {
       "insight_id": "IN-001",
-      "claim": "F-DC-002 (Critical): Chronology breach where ship_date precedes production_date, creating direct cutoff/traceability risk and likely audit-blocker conditions pending explanation and correction.",
-      "evidence_refs": [],
-      "confidence": 0.7,
+      "claim": "",
+      "evidence_refs": [
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '48', 'field_name': 'ship_date', 'observed_value': '2024-10-29', 'expected_or_conflicting_value': 'after production_date 2027-03-06'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '465', 'field_name': 'ship_date', 'observed_value': '2025-12-29', 'expected_or_conflicting_value': 'after production_date 2027-09-25'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '1405', 'field_name': 'ship_date', 'observed_value': '2025-12-09', 'expected_or_conflicting_value': 'after production_date 2025-12-12'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '1416', 'field_name': 'ship_date', 'observed_value': '2025-05-15', 'expected_or_conflicting_value': 'after production_date 2027-06-17'}"
+      ],
+      "confidence": 0.78,
       "caveats": [],
       "status": "candidate",
       "type": "InsightCard"
     },
     {
       "insight_id": "IN-002",
-      "claim": "F-DC-003 (High): Negative quantities recorded for manufactured inventory records, raising existence/valuation and COGS accuracy risk unless supported by documented adjustment/return/scrap transaction semantics.",
-      "evidence_refs": [],
-      "confidence": 0.7,
+      "claim": "",
+      "evidence_refs": [
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '939', 'field_name': 'quantity', 'observed_value': '-445', 'expected_or_conflicting_value': 'positive quantity'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '2563', 'field_name': 'quantity', 'observed_value': '-164', 'expected_or_conflicting_value': 'positive quantity'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '3823', 'field_name': 'quantity', 'observed_value': '-32', 'expected_or_conflicting_value': 'positive quantity'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '4485', 'field_name': 'quantity', 'observed_value': '-319', 'expected_or_conflicting_value': 'positive quantity'}"
+      ],
+      "confidence": 0.78,
       "caveats": [],
       "status": "candidate",
       "type": "InsightCard"
     },
     {
       "insight_id": "IN-003",
-      "claim": "F-DC-005 (High): Conflicting quantity values for the same entity across records, indicating weak versioning/change control and a risk of misstated inventory balances due to uncertain authoritative values.",
-      "evidence_refs": [],
-      "confidence": 0.7,
+      "claim": "",
+      "evidence_refs": [
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'customer_id', 'observed_value': 'CX-A228', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '51', 'field_name': 'customer_id', 'observed_value': 'CX-G153', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '87', 'field_name': 'customer_id', 'observed_value': 'CX-E185', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '276', 'field_name': 'customer_id', 'observed_value': 'CX-N823', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}"
+      ],
+      "confidence": 0.78,
       "caveats": [],
       "status": "candidate",
       "type": "InsightCard"
     },
     {
       "insight_id": "IN-004",
-      "claim": "F-DC-001 (High): Transactions reference customer_id values not present in the customer master file, indicating master-data completeness/validity control failure impacting AR attribution and customer traceability.",
-      "evidence_refs": [],
-      "confidence": 0.7,
+      "claim": "",
+      "evidence_refs": [
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'quantity', 'observed_value': '592', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '4', 'field_name': 'quantity', 'observed_value': '826', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '7', 'field_name': 'quantity', 'observed_value': '4137', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '8', 'field_name': 'quantity', 'observed_value': '4455', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}"
+      ],
+      "confidence": 0.78,
       "caveats": [],
       "status": "candidate",
       "type": "InsightCard"
     },
     {
       "insight_id": "IN-005",
-      "claim": "F-DC-006 (Medium): Potential duplicate “row signature” patterns suggest double-count risk; however, prior note indicates duplicates may not exist at the full-row level, so confirmation is required before corrective actions.",
-      "evidence_refs": [],
-      "confidence": 0.7,
+      "claim": "",
+      "evidence_refs": [
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '2', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '4', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '5', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}"
+      ],
+      "confidence": 0.78,
       "caveats": [],
       "status": "candidate",
       "type": "InsightCard"
     },
     {
       "insight_id": "IN-006",
-      "claim": "F-DC-004 (Medium): Quantity paired with a physical measurement unit (“mm”) indicates data-definition ambiguity (count vs. measurement), which can drive aggregation/reporting errors unless standardized definitions are implemented.",
-      "evidence_refs": [],
-      "confidence": 0.7,
+      "claim": "",
+      "evidence_refs": [
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '26', 'field_name': 'record_id', 'observed_value': 'R-00025', 'expected_or_conflicting_value': 'duplicate row signature'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '40', 'field_name': 'record_id', 'observed_value': 'R-00039', 'expected_or_conflicting_value': 'duplicate row signature'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '46', 'field_name': 'record_id', 'observed_value': 'R-00045', 'expected_or_conflicting_value': 'duplicate row signature'}",
+        "{'source_file': 'track01_data_rescue.csv', 'row_number': '79', 'field_name': 'record_id', 'observed_value': 'R-00078', 'expected_or_conflicting_value': 'duplicate row signature'}"
+      ],
+      "confidence": 0.78,
       "caveats": [],
       "status": "candidate",
       "type": "InsightCard"
     }
   ],
   "report": {
-    "report_id": "AR-20260607191522",
+    "report_id": "AR-20260607202151",
     "readiness_score": 66,
     "readiness_probability": 0.333,
     "readiness_interval_low": 0.116,
     "readiness_interval_high": 0.58,
     "readiness_uncertainty": "high",
-    "readiness_reason": "aggregated 6 finding blocker probabilities; residual blocker load 3.27; 0 findings have fixable actions; 1 critical blockers remain; 0 Memory Patch updates applied",
+    "readiness_reason": "aggregated 6 finding blocker probabilities; residual blocker load 3.26; 0 findings have fixable actions; 1 critical blockers remain; 0 Memory Patch updates applied",
     "readiness_method": "pymc_beta",
-    "executive_summary": "Based on recalled findings, multiple data integrity exceptions are open in the dataset (track01_data_rescue.csv) that may weaken audit readiness. The most acute issue is a hard chronology breach (shipping occurring before production), which directly undermines cutoff assertions and traceability and is likely to be treated as an audit blocker until resolved. Additional high-severity risks include negative quantities in manufactured inventory records and conflicting quantities across records for the same entity, both of which can impact inventory valuation and downstream financial reporting. Master-data integrity is also impaired where customer IDs referenced in transactions do not exist in the customer master (track01_customers.csv). Medium-severity issues relate to potential near-duplicate signatures (double-count risk requiring confirmation) and ambiguous unit/quantity semantics (e.g., “mm”), which is primarily a definition/control design issue but may affect reporting accuracy.\n\nNo remediation decisions or patches were recalled for these items; all findings are currently open and flagged for triage.",
+    "executive_summary": "Six open data-quality findings were recalled from the track01_data_rescue.csv review set. Two themes dominate audit readiness risk: (1) transactional chronology and inventory integrity exceptions (Critical/High severity) and (2) master-data and modeling ambiguities that weaken traceability and reporting consistency (High/Medium severity). The most audit-sensitive exception is repeated instances where ship_date precedes production_date (F-DC-002), which directly challenges process chronology and may drive cut-off testing failures. Additional High-risk issues include negative quantities (F-DC-003), customer_id values not present in the customer master file (F-DC-001), and conflicting quantities for the same entity across records (F-DC-005). Medium risks include unit semantics ambiguity where quantity is paired with 'mm' (F-DC-004) and potential duplicate row signatures with an acknowledged evidentiary conflict pending verification (F-DC-006). All findings remain open and are marked for triage.",
     "critical_findings": [
       "F-DC-002",
       "F-DC-003",
@@ -890,12 +862,12 @@
     ],
     "ripple_updates": [],
     "open_risks": [
-      "{'finding_id': 'F-DC-002', 'severity': 'Critical', 'risk_score': 95, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'what_was_observed': 'Ship dates recorded earlier than corresponding production dates (chronology breach).', 'evidence_summary': [{'source_file': 'track01_data_rescue.csv', 'row_number': '48', 'field_name': 'ship_date', 'observed_value': '2024-10-29', 'expected_or_conflicting_value': 'after production_date 2027-03-06'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '465', 'field_name': 'ship_date', 'observed_value': '2025-12-29', 'expected_or_conflicting_value': 'after production_date 2027-09-25'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '1405', 'field_name': 'ship_date', 'observed_value': '2025-12-09', 'expected_or_conflicting_value': 'after production_date 2025-12-12'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '1416', 'field_name': 'ship_date', 'observed_value': '2025-05-15', 'expected_or_conflicting_value': 'after production_date 2027-06-17'}], 'audit_impact_narrative': 'This is a hard sequencing inconsistency that can invalidate timing-based assertions (cutoff) and the operational audit trail for inventory movement and revenue recognition. The finding rationale indicates there is no safe deterministic correction without a trusted source-of-truth date lineage (e.g., ERP/WMS/BOL).', 'suggested_action': 'Pending triage (requires authoritative source reconciliation rather than automated correction).', 'audit_blocker_probability': 0.815, 'credible_interval_low': 0.653, 'credible_interval_high': 0.933, 'uncertainty_level': 'medium'}",
-      "{'finding_id': 'F-DC-003', 'severity': 'High', 'risk_score': 90, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'what_was_observed': 'Negative quantities recorded in manufactured inventory records where positive quantities are expected.', 'evidence_summary': [{'source_file': 'track01_data_rescue.csv', 'row_number': '939', 'field_name': 'quantity', 'observed_value': '-445', 'expected_or_conflicting_value': 'positive quantity'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '2563', 'field_name': 'quantity', 'observed_value': '-164', 'expected_or_conflicting_value': 'positive quantity'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '3823', 'field_name': 'quantity', 'observed_value': '-32', 'expected_or_conflicting_value': 'positive quantity'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '4485', 'field_name': 'quantity', 'observed_value': '-319', 'expected_or_conflicting_value': 'positive quantity'}], 'audit_impact_narrative': 'Negative quantities may reflect legitimate reversals/returns/scrap adjustments; however, absent explicit transaction-type semantics, they represent a high-risk integrity condition that can distort inventory existence/valuation and COGS. The recalled rationale explicitly cautions against auto-flipping signs due to auditability concerns.', 'suggested_action': 'Pending triage (reconcile to transaction semantics and source records before corrections).', 'audit_blocker_probability': 0.786, 'credible_interval_low': 0.624, 'credible_interval_high': 0.917, 'uncertainty_level': 'medium'}",
-      "{'finding_id': 'F-DC-005', 'severity': 'High', 'risk_score': 88, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'what_was_observed': 'Conflicting quantity values across records for the same entity, indicating unclear authoritative versioning.', 'evidence_summary': [{'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'quantity', 'observed_value': '592', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '4', 'field_name': 'quantity', 'observed_value': '826', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '7', 'field_name': 'quantity', 'observed_value': '4137', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '8', 'field_name': 'quantity', 'observed_value': '4455', 'expected_or_conflicting_value': '4137, 4455, 592, 826'}], 'audit_impact_narrative': 'When the same entity has multiple quantity values, inventory balances and operational reporting can be misstated unless the organization can evidence a clear versioning/change-control rule (e.g., revision ID, effective date, last update timestamp, status). The recalled rationale notes automated selection is not safe without an explicit authoritative rule.', 'suggested_action': 'Pending triage (establish authoritative versioning rule; reconcile to source).', 'audit_blocker_probability': 0.77, 'credible_interval_low': 0.604, 'credible_interval_high': 0.904, 'uncertainty_level': 'medium'}",
-      "{'finding_id': 'F-DC-001', 'severity': 'High', 'risk_score': 80, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'what_was_observed': 'Customer IDs appear in transactional/production data but do not exist in the companion customer master file (track01_customers.csv).', 'evidence_summary': [{'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'customer_id', 'observed_value': 'CX-A228', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '51', 'field_name': 'customer_id', 'observed_value': 'CX-G153', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '87', 'field_name': 'customer_id', 'observed_value': 'CX-E185', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '276', 'field_name': 'customer_id', 'observed_value': 'CX-N823', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv'}], 'audit_impact_narrative': 'Missing master-data references weaken completeness/validity controls over customer attribution and can impair traceability for revenue/AR and customer due diligence. The recalled action rationale advises against “blind” creation of customer masters because it would not be a controlled, auditable fix.', 'suggested_action': 'Pending triage (perform controlled customer master reconciliation and governance review).', 'audit_blocker_probability': 0.719, 'credible_interval_low': 0.546, 'credible_interval_high': 0.871, 'uncertainty_level': 'high'}",
-      "{'finding_id': 'F-DC-006', 'severity': 'Medium', 'risk_score': 70, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'what_was_observed': 'Potential duplicate row signatures that could result in double-counting, pending confirmation.', 'evidence_summary': [{'source_file': 'track01_data_rescue.csv', 'row_number': '26', 'field_name': 'record_id', 'observed_value': 'R-00025', 'expected_or_conflicting_value': 'duplicate row signature'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '40', 'field_name': 'record_id', 'observed_value': 'R-00039', 'expected_or_conflicting_value': 'duplicate row signature'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '46', 'field_name': 'record_id', 'observed_value': 'R-00045', 'expected_or_conflicting_value': 'duplicate row signature'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '79', 'field_name': 'record_id', 'observed_value': 'R-00078', 'expected_or_conflicting_value': 'duplicate row signature'}], 'audit_impact_narrative': 'Potential duplicates can inflate inventory/throughput if they represent true double-postings. However, the ranking rationale notes an apparent contradiction (source-level summary indicating no duplicates overall), suggesting the detection may be based on a signature/near-duplicate heuristic. Deletion/merging without confirmation could create additional audit issues.', 'suggested_action': 'Pending triage (validate whether duplicates are true full-row duplicates vs. signature collisions).', 'audit_blocker_probability': 0.659, 'credible_interval_low': 0.487, 'credible_interval_high': 0.82, 'uncertainty_level': 'high'}",
-      "{'finding_id': 'F-DC-004', 'severity': 'Medium', 'risk_score': 62, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'what_was_observed': 'Quantity values are paired with physical measurement units (e.g., “mm”), creating ambiguity between “count” and “measurement” semantics.', 'evidence_summary': [{'source_file': 'track01_data_rescue.csv', 'row_number': '2', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '4', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '5', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm'}], 'audit_impact_narrative': 'This indicates a data-definition/control design gap: without standardized definitions, reporting and aggregation may mix dimensional measurements with discrete counts, potentially distorting KPIs and, indirectly, financial metrics if used in valuation or production reporting. The recalled rationale states it cannot be safely auto-corrected without business definitions.', 'suggested_action': 'Pending triage (define and enforce unit-of-measure semantics and validation rules).', 'audit_blocker_probability': 0.605, 'credible_interval_low': 0.423, 'credible_interval_high': 0.772, 'uncertainty_level': 'high'}"
+      "{'finding_id': 'F-DC-002', 'severity': 'Critical', 'risk_score': 95, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'condition_observed': 'ship_date appears earlier than production_date in multiple records.', 'evidence': [{'source_file': 'track01_data_rescue.csv', 'row_number': '48', 'field_name': 'ship_date', 'observed_value': '2024-10-29', 'expected_or_conflicting_value': 'after production_date 2027-03-06', 'explanation': 'Shipping date appears before production date.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '465', 'field_name': 'ship_date', 'observed_value': '2025-12-29', 'expected_or_conflicting_value': 'after production_date 2027-09-25', 'explanation': 'Shipping date appears before production date.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '1405', 'field_name': 'ship_date', 'observed_value': '2025-12-09', 'expected_or_conflicting_value': 'after production_date 2025-12-12', 'explanation': 'Shipping date appears before production date.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '1416', 'field_name': 'ship_date', 'observed_value': '2025-05-15', 'expected_or_conflicting_value': 'after production_date 2027-06-17', 'explanation': 'Shipping date appears before production date.'}], 'audit_impact_narrative': 'Chronology breaks impair traceability and can trigger audit exceptions in cut-off and fulfillment/production linkage testing; multiple occurrences support a systemic issue hypothesis.', 'suggested_action': 'Pending triage', 'audit_blocker_probability': 0.815, 'credible_interval_low': 0.653, 'credible_interval_high': 0.933, 'uncertainty_level': 'medium'}",
+      "{'finding_id': 'F-DC-003', 'severity': 'High', 'risk_score': 90, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'condition_observed': 'Negative quantities recorded where positive quantities are expected for manufactured inventory records.', 'evidence': [{'source_file': 'track01_data_rescue.csv', 'row_number': '939', 'field_name': 'quantity', 'observed_value': '-445', 'expected_or_conflicting_value': 'positive quantity', 'explanation': 'Quantity should be positive for manufactured inventory records.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '2563', 'field_name': 'quantity', 'observed_value': '-164', 'expected_or_conflicting_value': 'positive quantity', 'explanation': 'Quantity should be positive for manufactured inventory records.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '3823', 'field_name': 'quantity', 'observed_value': '-32', 'expected_or_conflicting_value': 'positive quantity', 'explanation': 'Quantity should be positive for manufactured inventory records.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '4485', 'field_name': 'quantity', 'observed_value': '-319', 'expected_or_conflicting_value': 'positive quantity', 'explanation': 'Quantity should be positive for manufactured inventory records.'}], 'audit_impact_narrative': 'Absent explicit adjustment/returns transaction typing, negative manufactured quantities represent high-risk integrity exceptions that can misstate inventory/COGS and require reconciliation support for audit reliance.', 'suggested_action': 'Pending triage', 'audit_blocker_probability': 0.786, 'credible_interval_low': 0.624, 'credible_interval_high': 0.917, 'uncertainty_level': 'medium'}",
+      "{'finding_id': 'F-DC-001', 'severity': 'High', 'risk_score': 80, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'condition_observed': 'customer_id references in track01_data_rescue.csv do not appear in the companion customer master file (track01_customers.csv).', 'evidence': [{'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'customer_id', 'observed_value': 'CX-A228', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv', 'explanation': 'Customer reference does not appear in the companion customer master file.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '51', 'field_name': 'customer_id', 'observed_value': 'CX-G153', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv', 'explanation': 'Customer reference does not appear in the companion customer master file.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '87', 'field_name': 'customer_id', 'observed_value': 'CX-E185', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv', 'explanation': 'Customer reference does not appear in the companion customer master file.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '276', 'field_name': 'customer_id', 'observed_value': 'CX-N823', 'expected_or_conflicting_value': 'customer_id present in track01_customers.csv', 'explanation': 'Customer reference does not appear in the companion customer master file.'}], 'audit_impact_narrative': 'Broken referential integrity reduces confidence in customer-level reporting and control reliance where customer master governance is a key control (e.g., customer attribution, shipment accountability).', 'suggested_action': 'Pending triage', 'audit_blocker_probability': 0.719, 'credible_interval_low': 0.546, 'credible_interval_high': 0.871, 'uncertainty_level': 'high'}",
+      "{'finding_id': 'F-DC-005', 'severity': 'High', 'risk_score': 87, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'condition_observed': \"Conflicting numeric quantity values for what is described as the 'same entity' across multiple records.\", 'evidence': [{'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'quantity', 'observed_value': '592', 'expected_or_conflicting_value': '4137, 4455, 592, 826', 'explanation': 'The same entity has different numeric values across records.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '4', 'field_name': 'quantity', 'observed_value': '826', 'expected_or_conflicting_value': '4137, 4455, 592, 826', 'explanation': 'The same entity has different numeric values across records.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '7', 'field_name': 'quantity', 'observed_value': '4137', 'expected_or_conflicting_value': '4137, 4455, 592, 826', 'explanation': 'The same entity has different numeric values across records.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '8', 'field_name': 'quantity', 'observed_value': '4455', 'expected_or_conflicting_value': '4137, 4455, 592, 826', 'explanation': 'The same entity has different numeric values across records.'}], 'audit_impact_narrative': 'Non-deterministic quantities at an assumed stable grain can impair inventory valuation and operational reporting; auditors may require clarification of dataset grain and source-of-truth controls.', 'suggested_action': 'Pending triage', 'audit_blocker_probability': 0.764, 'credible_interval_low': 0.596, 'credible_interval_high': 0.899, 'uncertainty_level': 'medium'}",
+      "{'finding_id': 'F-DC-004', 'severity': 'Medium', 'risk_score': 71, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'condition_observed': \"Quantity is paired with a physical measurement unit ('mm'), indicating potential semantic ambiguity (count vs measurement).\", 'evidence': [{'source_file': 'track01_data_rescue.csv', 'row_number': '2', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm', 'explanation': 'Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '3', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm', 'explanation': 'Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '4', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm', 'explanation': 'Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '5', 'field_name': 'unit', 'observed_value': 'mm', 'expected_or_conflicting_value': 'mm', 'explanation': 'Quantity is paired with a physical measurement unit, so count versus measurement semantics need reconciliation.'}], 'audit_impact_narrative': 'If quantity fields drive costing/valuation, unit ambiguity can propagate unit-conversion or pricing errors; current evidence supports a modeling ambiguity but not a quantified misstatement.', 'suggested_action': 'Pending triage', 'audit_blocker_probability': 0.663, 'credible_interval_low': 0.486, 'credible_interval_high': 0.819, 'uncertainty_level': 'high'}",
+      "{'finding_id': 'F-DC-006', 'severity': 'Medium', 'risk_score': 60, 'status': 'open', 'audit_risk': 'May weaken audit readiness.', 'condition_observed': 'Rows repeat the same record signature and may double-count a batch or inspection; the finding notes a conflict with a datasource quality summary reporting zero duplicates.', 'evidence': [{'source_file': 'track01_data_rescue.csv', 'row_number': '26', 'field_name': 'record_id', 'observed_value': 'R-00025', 'expected_or_conflicting_value': 'duplicate row signature', 'explanation': 'Rows repeat the same record signature and may double-count a batch or inspection.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '40', 'field_name': 'record_id', 'observed_value': 'R-00039', 'expected_or_conflicting_value': 'duplicate row signature', 'explanation': 'Rows repeat the same record signature and may double-count a batch or inspection.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '46', 'field_name': 'record_id', 'observed_value': 'R-00045', 'expected_or_conflicting_value': 'duplicate row signature', 'explanation': 'Rows repeat the same record signature and may double-count a batch or inspection.'}, {'source_file': 'track01_data_rescue.csv', 'row_number': '79', 'field_name': 'record_id', 'observed_value': 'R-00078', 'expected_or_conflicting_value': 'duplicate row signature', 'explanation': 'Rows repeat the same record signature and may double-count a batch or inspection.'}], 'audit_impact_narrative': 'If confirmed, duplicates can inflate production/inspection counts; however, due to the noted evidentiary conflict, the immediate audit conclusion is deferred pending verification of the deduplication logic and signature definition.', 'suggested_action': 'Pending triage', 'audit_blocker_probability': 0.599, 'credible_interval_low': 0.421, 'credible_interval_high': 0.772, 'uncertainty_level': 'high'}"
     ],
     "pdf_path": "runtime/artifacts/audit_passport_summary.pdf",
     "status": "active",
@@ -924,7 +896,7 @@
       "memory_reads": 3,
       "memory_writes": 6,
       "status": "active",
-      "written_at": "2026-06-07T19:13:19+00:00",
+      "written_at": "2026-06-07T20:19:32+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -947,7 +919,7 @@
       "memory_reads": 3,
       "memory_writes": 4,
       "status": "active",
-      "written_at": "2026-06-07T19:13:57+00:00",
+      "written_at": "2026-06-07T20:20:08+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -969,7 +941,7 @@
       "memory_reads": 2,
       "memory_writes": 4,
       "status": "active",
-      "written_at": "2026-06-07T19:14:37+00:00",
+      "written_at": "2026-06-07T20:20:54+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -994,7 +966,7 @@
       "memory_reads": 5,
       "memory_writes": 4,
       "status": "active",
-      "written_at": "2026-06-07T19:15:22+00:00",
+      "written_at": "2026-06-07T20:21:51+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -1017,17 +989,17 @@
       "memory_reads": 4,
       "memory_writes": 3,
       "status": "active",
-      "written_at": "2026-06-07T19:15:53+00:00",
+      "written_at": "2026-06-07T20:22:29+00:00",
       "type": "AgentOutcome"
     }
   ],
   "prompt_traces": [
     {
-      "trace_id": "TRACE-20260607191319-Data-Ing",
+      "trace_id": "TRACE-20260607201932-Data-Ing",
       "agent": "Data Ingestion & Detective Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
-      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"prior_cognee_context\": 3, \"sources\": 2, \"schemas\": 2, \"detection_candidates\": 6, \"output_contract\": \"Return findings[] as FindingCard-shaped objects and outcome as AgentOutcome-shap\"}",
+      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"prior_cognee_context\": 0, \"sources\": 2, \"schemas\": 2, \"detection_candidates\": 6, \"output_contract\": \"Return findings[] as FindingCard-shaped objects and outcome as AgentOutcome-shap\"}",
       "output_validation_status": "valid",
       "recalled_datasets": [
         "sources",
@@ -1039,13 +1011,13 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_02c96a767e004b56006a25c2a46aec8194a08910d1f9d54147",
+      "response_id": "resp_0e6920cb41bd4db4006a25d2237e148197a1bf1e9b31898325",
       "status": "active",
-      "written_at": "2026-06-07T19:13:19+00:00",
+      "written_at": "2026-06-07T20:19:32+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607191352-Classifi",
+      "trace_id": "TRACE-20260607202006-Classifi",
       "agent": "Classification & Risk Prioritizer Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
@@ -1062,13 +1034,13 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_0211f674648f02db006a25c2dc2e908195922469e1de38fa83",
+      "response_id": "resp_044d793b62b51965006a25d263817081968006d603890e97f6",
       "status": "active",
-      "written_at": "2026-06-07T19:13:52+00:00",
+      "written_at": "2026-06-07T20:20:06+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607191437-Reconcil",
+      "trace_id": "TRACE-20260607202054-Reconcil",
       "agent": "Reconciliation & Remediation Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
@@ -1084,13 +1056,13 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_003e7a548f9c3a85006a25c2fff5f08196b0d11705bce677d9",
+      "response_id": "resp_0a1b4f6a62f9260d006a25d285535c8197a24de5075b43dc9c",
       "status": "active",
-      "written_at": "2026-06-07T19:14:37+00:00",
+      "written_at": "2026-06-07T20:20:54+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607191521-Narrativ",
+      "trace_id": "TRACE-20260607202151-Narrativ",
       "agent": "Narrative & Audit Report Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
@@ -1109,13 +1081,13 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_0565b297b7843338006a25c32ad25c8197938192276c7a7362",
+      "response_id": "resp_0a2fccb2ca1944c3006a25d2b061888193acaa6d016f2bc7a3",
       "status": "active",
-      "written_at": "2026-06-07T19:15:21+00:00",
+      "written_at": "2026-06-07T20:21:51+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607191553-UI-Demo-",
+      "trace_id": "TRACE-20260607202229-UI-Demo-",
       "agent": "UI Demo & Feedback Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
@@ -1132,9 +1104,9 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_0530ec4a179571bf006a25c3542a1081939ccbf157c08fa35d",
+      "response_id": "resp_0a7f7582ba8726db006a25d2f1bff88194b9e9eb5eaa82cb77",
       "status": "active",
-      "written_at": "2026-06-07T19:15:53+00:00",
+      "written_at": "2026-06-07T20:22:29+00:00",
       "type": "AgentPromptTrace"
     }
   ],
@@ -1142,26 +1114,26 @@
     "digest_id": "FD-001",
     "summary": "",
     "recommended_next_action": "",
-    "memory_timeline_health": "{'status': 'Needs attention (inspectable, but inconsistent artifacts)', 'what_looks_good': ['Handoff is inspectable: agent_outcomes show who read/wrote which datasets and when.', 'UI pattern appears compliant with stated intent: UI agent emphasizes inspectability and claims it does not store ordinary UI clicks; only explicit feedback should be promoted.', 'Causal-chain/ripple concept demonstrated: MP-001 → updated F-DC-002 risk 95→74 and moved state toward “Suggested Fix.”'], 'what_looks_risky_or_inconsistent': ['Duplicate/near-duplicate outcomes: the UI agent wrote the same outcome multiple times (17:18, 17:31, 17:33), which can create timeline noise and complicate audit review.', 'Data Ingestion agent reports “produced 0 finding cards,” while the insights reference multiple finding IDs (F-DC-001…006). That mismatch suggests either (a) findings were created outside the captured outcome log, (b) findings exist but weren’t attributed correctly, or (c) insights were generated without confirmed finding objects in memory.', 'Insight cards have empty evidence_refs across the board, which weakens audit defensibility (claims exist, but evidence pointers are not attached).', 'Narrative/report agent produced multiple reports with “readiness score 100” despite the above gaps—this may be a scoring/criteria issue and could mislead a compliance reviewer if not qualified.', 'Classification agent consistently ranked 0 findings (“Top risk: none”), which conflicts with the existence of critical/high insights and the later ripple update to F-DC-002.'], 'net_assessment': 'The timeline is viewable and the ripple update is captured, but provenance/evidence linkage and cross-agent consistency need remediation before a compliance-grade signoff.'}",
+    "memory_timeline_health": "{'status': 'mixed', 'what_looks_good': ['Handoff timeline is populated with AgentOutcome cards across agents (ingestion → classification → narrative/report → UI demo), enabling an inspectable chain of custody.', 'UI agent behavior is aligned with the constraint: it exposes drill-down/timeline and (per its stated reason) avoids promoting ordinary UI clicks into memory.', 'A causal update (“Memory Ripple”) is demonstrably captured: MP-001 → updated finding F-DC-002 risk 95 → 74 and status Pending triage → Suggested Fix, which is exactly the kind of auditable downstream impact a compliance workflow needs.'], 'issues_to_fix': ['Duplicate/near-duplicate AgentOutcome entries for the same UI task appear multiple times (17:18, 17:31, 17:33). This can confuse audit review and inflate “memory_event_count” without adding new facts.', 'Data consistency gap: Ingestion and Classification outcomes state “produced 0 finding cards / ranked 0 findings,” yet the timeline later references a concrete finding (F-DC-002) and a patch (MP-001). This suggests either (a) earlier outcomes are stale, (b) findings were created outside the recorded ingestion run, or (c) IDs are not consistently linked in memory.', 'Insight cards IN-001..IN-006 have empty `claim` fields while still carrying evidence refs. That weakens explainability and makes it harder for a compliance officer to approve/reject the insight without re-deriving meaning from raw evidence.', 'Narrative report outcomes show readiness score 100, but have empty `evidence_refs`. For compliance sign-off, the report card should cite the accepted memory cards/findings/patches it is based on.', 'No explicit user/compliance feedback is recorded yet (`explicit_user_feedback` is empty), so there is no documented human decision/attestation in the memory timeline.'], 'risk_implications': ['Audit defensibility risk: duplicated/stale outcomes plus missing evidence links can undermine “who decided what, based on what.”', 'Control effectiveness risk: readiness=100 is hard to justify if the system simultaneously reports 0 findings while insights indicate data quality issues (ship_date conflicts, negative quantity, missing customer_id mapping, duplicates).']}",
     "evidence_refs": [],
     "status": "active",
-    "written_at": "2026-06-07T19:15:53+00:00",
+    "written_at": "2026-06-07T20:22:29+00:00",
     "type": "FeedbackDigest"
   },
   "memory_events": [
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "recall",
+      "event_type": "memory_error",
       "dataset": "project:audit_passport:sources, project:audit_passport:schema, project:audit_passport:memory_patches",
-      "summary": "Find prior data source, schema, active memory patches, and past ingestion decisions before ingesting Kaggle audit data.",
-      "status": "ok",
+      "summary": "LanceDBAdapter is closed; a new adapter must be created (subprocess-mode adapters cannot be re-initialized).",
+      "status": "error",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_batch",
       "dataset": "project:audit_passport:sources",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607191109:ingest', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607201830:ingest', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1169,7 +1141,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_shared_batch",
       "dataset": "project:audit_passport:sources",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1177,7 +1149,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_batch",
       "dataset": "project:audit_passport:schema",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607191109:ingest', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607201830:ingest', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1185,7 +1157,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_shared_batch",
       "dataset": "project:audit_passport:schema",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1193,7 +1165,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_batch",
       "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607191109:ingest', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607201830:ingest', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1201,7 +1173,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_shared_batch",
       "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1209,7 +1181,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_batch",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607191109:ingest', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607201830:ingest', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1217,7 +1189,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_shared_batch",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1225,7 +1197,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:ingest', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:ingest', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1233,7 +1205,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1241,7 +1213,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:ingest', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:ingest', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1249,7 +1221,7 @@
       "agent": "Data Ingestion & Detective Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1305,7 +1277,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:baselines",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:baselines', session_id='ap:audit_passport:run-20260607191109:classify', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:baselines', session_id='ap:audit_passport:run-20260607201830:classify', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1313,7 +1285,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:baselines",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:baselines', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:baselines', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1321,7 +1293,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember_batch",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607191109:classify', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607201830:classify', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1329,7 +1301,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember_shared_batch",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1337,7 +1309,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:classify', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:classify', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1345,7 +1317,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1353,7 +1325,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:classify', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:classify', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1361,7 +1333,7 @@
       "agent": "Classification & Risk Prioritizer Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1449,7 +1421,7 @@
       "agent": "Reconciliation & Remediation Agent",
       "event_type": "remember_batch",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607191109:reconcile', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607201830:reconcile', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1457,7 +1429,7 @@
       "agent": "Reconciliation & Remediation Agent",
       "event_type": "remember_shared_batch",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1465,7 +1437,7 @@
       "agent": "Reconciliation & Remediation Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:reconcile', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:reconcile', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1473,7 +1445,7 @@
       "agent": "Reconciliation & Remediation Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1481,7 +1453,7 @@
       "agent": "Reconciliation & Remediation Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:reconcile', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:reconcile', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1489,7 +1461,7 @@
       "agent": "Reconciliation & Remediation Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1505,7 +1477,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "recall_local_fallback",
       "dataset": "project:audit_passport:findings",
-      "summary": "Used 18 cards from current run local memory after Cognee recall returned no parseable cards.",
+      "summary": "Used 17 cards from current run local memory after Cognee recall returned no parseable cards.",
       "status": "local",
       "error": ""
     },
@@ -1537,7 +1509,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember_batch",
       "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607191109:narrative', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607201830:narrative', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1545,7 +1517,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember_shared_batch",
       "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1553,7 +1525,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:reports",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:reports', session_id='ap:audit_passport:run-20260607191109:narrative', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:reports', session_id='ap:audit_passport:run-20260607201830:narrative', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1561,7 +1533,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:reports",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:reports', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:reports', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1569,7 +1541,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:narrative', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:narrative', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1577,7 +1549,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1585,7 +1557,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:narrative', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:narrative', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1593,7 +1565,7 @@
       "agent": "Narrative & Audit Report Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1625,7 +1597,7 @@
       "agent": "UI Demo & Feedback Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:feedback_digests",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:feedback_digests', session_id='ap:audit_passport:run-20260607191109:ui', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:feedback_digests', session_id='ap:audit_passport:run-20260607201830:ui', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1633,7 +1605,7 @@
       "agent": "UI Demo & Feedback Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:feedback_digests",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:feedback_digests', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:feedback_digests', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1641,7 +1613,7 @@
       "agent": "UI Demo & Feedback Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:ui', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:ui', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1649,7 +1621,7 @@
       "agent": "UI Demo & Feedback Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1657,7 +1629,7 @@
       "agent": "UI Demo & Feedback Agent",
       "event_type": "remember",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:ui', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:ui', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     },
@@ -1665,13 +1637,14 @@
       "agent": "UI Demo & Feedback Agent",
       "event_type": "remember_shared",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607191109:shared', elapsed=0.0s)",
+      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607201830:shared', elapsed=0.0s)",
       "status": "ok",
       "error": ""
     }
   ],
   "cognee_enabled": true,
   "cognee_errors": [
+    "Data Ingestion & Detective Agent / project:audit_passport:sources, project:audit_passport:schema, project:audit_passport:memory_patches: LanceDBAdapter is closed; a new adapter must be created (subprocess-mode adapters cannot be re-initialized).",
     "Narrative & Audit Report Agent / project:audit_passport:reconciliation: DatasetNotFoundError: No datasets found. (Status code: 404)",
     "UI Demo & Feedback Agent / project:audit_passport:insights: DatasetNotFoundError: No datasets found. (Status code: 404)"
   ],

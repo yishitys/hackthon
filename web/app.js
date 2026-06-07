@@ -380,9 +380,11 @@ function metrics(run) {
     readinessLow: run?.report?.readiness_interval_low ?? null,
     readinessHigh: run?.report?.readiness_interval_high ?? null,
     readinessUncertainty: run?.report?.readiness_uncertainty ?? "unscored",
-    critical: findings.filter((finding) => finding.severity === "Critical").length,
+    critical: findings.filter((finding) => String(finding.severity).toLowerCase() === "critical").length,
     findings: findings.length,
-    ready: findings.filter((finding) => ["Safe Auto-Fix", "Suggested Fix"].includes(finding.suggested_action)).length,
+    ready: findings.filter((finding) =>
+      ["safe auto-fix", "suggested fix"].includes(String(finding.suggested_action).toLowerCase())
+    ).length,
     patches: (run?.patches || []).length,
   };
 }
@@ -685,6 +687,38 @@ function renderDetail(run) {
   });
 }
 
+function renderGeodoResearch(run) {
+  const grid = $("geodoGrid");
+  if (!grid) return;
+  const research = run?.geodo_research || [];
+  if (!research.length) {
+    grid.innerHTML = `<div class="empty-state">Start the demo to load the Geodo research the narrative agent used.</div>`;
+    return;
+  }
+  grid.innerHTML = research
+    .map(
+      (item) => `
+        <article class="geodo-item">
+          <div class="geodo-top">
+            <span class="geodo-pill">${escapeHtml(item.entity_type || "research")}</span>
+            <span class="mono">${escapeHtml(item.research_id || "")}</span>
+          </div>
+          <h3>${escapeHtml(item.entity || "")}</h3>
+          <p class="geodo-summary">${escapeHtml(item.summary || "")}</p>
+          <ul class="geodo-facts">
+            ${(item.key_facts || []).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}
+          </ul>
+          <p class="geodo-implication"><strong>Audit implication:</strong> ${escapeHtml(item.risk_implication || "")}</p>
+          <div class="geodo-foot">
+            <span>Confidence ${formatProbability(item.confidence)}</span>
+            <a href="${escapeHtml(item.source_url || "https://geodo.ai")}" target="_blank" rel="noopener">Geodo source</a>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
+}
+
 function renderQualityAlerts(run) {
   const findings = run?.findings || [];
   if (!findings.length) {
@@ -850,6 +884,7 @@ function render() {
   renderStages(run);
   renderPassports(run);
   renderDetail(run);
+  renderGeodoResearch(run);
   renderQualityAlerts(run);
   renderFinalRepairPlan(run);
   $("runAgentsBtn").disabled = state.isRunning;

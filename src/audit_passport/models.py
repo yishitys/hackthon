@@ -144,6 +144,20 @@ class InsightCard:
 
 
 @dataclass
+class GeodoResearchCard:
+    research_id: str
+    entity: str
+    entity_type: str
+    summary: str
+    key_facts: list[str]
+    risk_implication: str
+    source_url: str
+    confidence: float
+    status: str = "active"
+    type: str = "GeodoResearch"
+
+
+@dataclass
 class AuditReportCard:
     report_id: str
     readiness_score: int
@@ -230,6 +244,7 @@ class AuditRun:
     candidates: list[DetectionCandidateCard] = field(default_factory=list)
     patches: list[MemoryPatch] = field(default_factory=list)
     insights: list[InsightCard] = field(default_factory=list)
+    geodo_research: list[GeodoResearchCard] = field(default_factory=list)
     report: AuditReportCard | None = None
     outcomes: list[AgentOutcomeCard] = field(default_factory=list)
     prompt_traces: list[AgentPromptTraceCard] = field(default_factory=list)

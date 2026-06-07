@@ -13,6 +13,7 @@ PROMOTABLE_TYPES = {
     "ReconciliationDecision",
     "MemoryPatch",
     "InsightCard",
+    "GeodoResearch",
     "AuditReportCard",
     "AgentOutcome",
     "AgentPromptTrace",

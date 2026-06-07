@@ -1248,9 +1248,6 @@ h3 {
   font-size: 11px;
 }
 
-.action-panel {
-  margin-top: var(--s5);
-}
 
 .action-body .detail-block:last-child {
   margin-bottom: 0;
@@ -1555,4 +1552,103 @@ h3 {
   .ready-body {
     grid-template-columns: 1fr;
   }
+}
+
+/* Geodo real-world research (R04) */
+.geodo-card {
+  border-top: 3px solid var(--cool);
+}
+
+.geodo-link {
+  color: var(--cool);
+  text-decoration: none;
+  border-bottom: 1px solid var(--cool);
+}
+
+.geodo-intro {
+  margin: 0 0 var(--s4);
+  color: var(--ink-2);
+  max-width: 70ch;
+}
+
+.geodo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--s4);
+}
+
+.geodo-item {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--cool-tint);
+  padding: var(--s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.geodo-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+.geodo-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cool-ink);
+  background: var(--paper);
+  border: 1px solid var(--cool-deep);
+  border-radius: var(--radius);
+  padding: 2px var(--s2);
+}
+
+.geodo-item h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.geodo-summary {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.geodo-facts {
+  margin: 0;
+  padding-left: var(--s4);
+  color: var(--ink-2);
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.geodo-implication {
+  margin: 0;
+  font-size: 13px;
+  color: var(--cool-ink);
+}
+
+.geodo-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-top: auto;
+  padding-top: var(--s2);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.geodo-foot a {
+  color: var(--cool);
+  text-decoration: none;
+  border-bottom: 1px solid var(--cool);
 }

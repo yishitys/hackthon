@@ -19,6 +19,7 @@ from .models import (
     Evidence,
     FeedbackDigestCard,
     FindingCard,
+    GeodoResearchCard,
     InsightCard,
     MemoryPatch,
     ReconciliationDecisionCard,
@@ -37,6 +38,7 @@ DATASETS = {
     "reconciliation": "project:audit_passport:reconciliation",
     "memory_patches": "project:audit_passport:memory_patches",
     "insights": "project:audit_passport:insights",
+    "geodo_research": "project:audit_passport:geodo_research",
     "reports": "project:audit_passport:reports",
     "agent_outcomes": "project:audit_passport:agent_outcomes",
     "prompt_traces": "project:audit_passport:prompt_traces",
@@ -54,6 +56,7 @@ CARD_TYPES = {
     "ReconciliationDecision": ReconciliationDecisionCard,
     "MemoryPatch": MemoryPatch,
     "InsightCard": InsightCard,
+    "GeodoResearch": GeodoResearchCard,
     "AuditReportCard": AuditReportCard,
     "AgentOutcome": AgentOutcomeCard,
     "AgentPromptTrace": AgentPromptTraceCard,
@@ -312,7 +315,7 @@ def card_from_dict(data: dict[str, Any]) -> Any | None:
     if cls is None:
         return None
     if cls in {DataSourceCard, SchemaCard, ClassificationBaselineCard, ReconciliationDecisionCard, MemoryPatch,
-               InsightCard, AuditReportCard, AgentOutcomeCard, AgentPromptTraceCard, UserFeedbackCard,
+               InsightCard, GeodoResearchCard, AuditReportCard, AgentOutcomeCard, AgentPromptTraceCard, UserFeedbackCard,
                FeedbackDigestCard}:
         return cls(**normalized)
     return None

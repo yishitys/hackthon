@@ -1,13 +1,13 @@
 {
   "project_id": "audit_passport",
-  "run_id": "run-20260607183745",
-  "shared_session_id": "ap:audit_passport:run-20260607183745:shared",
+  "run_id": "run-20260607200322",
+  "shared_session_id": "ap:audit_passport:run-20260607200322:shared",
   "agent_sessions": {
-    "ingest": "ap:audit_passport:run-20260607183745:ingest",
-    "classify": "ap:audit_passport:run-20260607183745:classify",
-    "reconcile": "ap:audit_passport:run-20260607183745:reconcile",
-    "narrative": "ap:audit_passport:run-20260607183745:narrative",
-    "ui": "ap:audit_passport:run-20260607183745:ui"
+    "ingest": "ap:audit_passport:run-20260607200322:ingest",
+    "classify": "ap:audit_passport:run-20260607200322:classify",
+    "reconcile": "ap:audit_passport:run-20260607200322:reconcile",
+    "narrative": "ap:audit_passport:run-20260607200322:narrative",
+    "ui": "ap:audit_passport:run-20260607200322:ui"
   },
   "data_sources": [
     {
@@ -105,13 +105,13 @@
     {
       "finding_id": "F-DC-005",
       "type": "FindingCard",
-      "severity": "Critical",
-      "risk_score": 89,
+      "severity": "High",
+      "risk_score": 87,
       "confidence": 0.7,
       "affected_entity": "plant_id: A",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
-      "suggested_action": "Pending triage",
+      "suggested_action": "Escalate",
       "status": "open",
       "evidence": [
         {
@@ -149,27 +149,27 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Same entity showing multiple conflicting quantity values (given the stated grain 'one row per plant_id/part_number') indicates key constraint violations or uncontrolled overwrites/versioning. This can cascade into inventory valuation, fulfillment accuracy, and audit trail reliability; confidence tempered because the dataset may actually contain multiple transactions over time despite the grain note.",
-      "action_rationale": "",
+      "ranking_reason": "Inconsistent numeric values for the 'same entity' suggests unstable master/transaction definitions or keying issues; this can materially affect inventory valuation and reproducibility of reported metrics. Confidence moderated because the exact entity key used for comparison is not shown.",
+      "action_rationale": "Inconsistent numeric values for the 'same entity' cannot be remediated until the entity key used for comparison is explicitly identified; otherwise any overwrite/dedup could destroy legitimate multi-event history.",
       "ripple_note": "",
-      "audit_blocker_probability": 0.777,
-      "credible_interval_low": 0.611,
-      "credible_interval_high": 0.908,
+      "audit_blocker_probability": 0.764,
+      "credible_interval_low": 0.596,
+      "credible_interval_high": 0.899,
       "uncertainty_level": "medium",
-      "probabilistic_reason": "rule score 89/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 87/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     },
     {
       "finding_id": "F-DC-003",
       "type": "FindingCard",
-      "severity": "Critical",
+      "severity": "High",
       "risk_score": 84,
-      "confidence": 0.72,
+      "confidence": 0.75,
       "affected_entity": "plant_id: A",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
-      "suggested_action": "Pending triage",
+      "suggested_action": "Manual Review Required",
       "status": "open",
       "evidence": [
         {
@@ -207,8 +207,8 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Negative quantities in manufactured inventory records suggest inventory integrity issues that can drive material misstatement and nonconforming reporting. Confidence reduced slightly because negatives can be legitimate for returns/scrap/adjustments if the record type is not strictly 'manufactured output' despite the stated expectation.",
-      "action_rationale": "",
+      "ranking_reason": "Negative manufactured quantities can materially distort inventory/production reporting; while negatives could reflect returns/scrap/adjustments, the finding indicates the dataset lacks clear transaction typing/controls—creating substantial audit risk.",
+      "action_rationale": "Negative quantities may be valid (returns/scrap/adjustments) or may indicate sign/convention errors. Without an explicit transaction_type or accounting rule, flipping signs would be unsafe.",
       "ripple_note": "",
       "audit_blocker_probability": 0.747,
       "credible_interval_low": 0.576,
@@ -219,69 +219,11 @@
       "memory_status": "active"
     },
     {
-      "finding_id": "F-DC-001",
-      "type": "FindingCard",
-      "severity": "High",
-      "risk_score": 75,
-      "confidence": 0.8,
-      "affected_entity": "plant_id: A",
-      "audit_risk": "May weaken audit readiness.",
-      "why_broken": "",
-      "suggested_action": "Pending triage",
-      "status": "open",
-      "evidence": [
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "3",
-          "field_name": "customer_id",
-          "observed_value": "CX-A228",
-          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
-          "explanation": "Customer reference does not appear in the companion customer master file."
-        },
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "51",
-          "field_name": "customer_id",
-          "observed_value": "CX-G153",
-          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
-          "explanation": "Customer reference does not appear in the companion customer master file."
-        },
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "87",
-          "field_name": "customer_id",
-          "observed_value": "CX-E185",
-          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
-          "explanation": "Customer reference does not appear in the companion customer master file."
-        },
-        {
-          "source_file": "track01_data_rescue.csv",
-          "row_number": "276",
-          "field_name": "customer_id",
-          "observed_value": "CX-N823",
-          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
-          "explanation": "Customer reference does not appear in the companion customer master file."
-        }
-      ],
-      "created_by_agent": "Data Ingestion & Detective Agent",
-      "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Customer_id values not present in the customer master file indicate referential integrity breakdown. This undermines customer traceability for shipments/invoices and can create audit sampling exceptions; however, it may also reflect an incomplete/out-of-date master extract (less direct regulatory impact than chronology or inventory integrity failures).",
-      "action_rationale": "",
-      "ripple_note": "",
-      "audit_blocker_probability": 0.687,
-      "credible_interval_low": 0.507,
-      "credible_interval_high": 0.844,
-      "uncertainty_level": "high",
-      "probabilistic_reason": "rule score 75/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
-      "scoring_method": "pymc_beta",
-      "memory_status": "active"
-    },
-    {
       "finding_id": "F-DC-002",
       "type": "FindingCard",
       "severity": "High",
-      "risk_score": 74,
-      "confidence": 0.82,
+      "risk_score": 75,
+      "confidence": 0.9,
       "affected_entity": "plant_id: A",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
@@ -325,25 +267,83 @@
       "last_updated_by_agent": "Classification & Risk Prioritizer Agent",
       "ranking_reason": "Risk lowered after MP-001; the contradiction is partly explained by unit semantics, but remaining records still carry audit impact.",
       "action_rationale": "Normalize units using the new source metadata, then keep only unresolved records in manual review.",
-      "ripple_note": "MP-001 changed risk 95 -> 74 and action Pending triage -> Suggested Fix.",
-      "audit_blocker_probability": 0.617,
-      "credible_interval_low": 0.441,
-      "credible_interval_high": 0.776,
+      "ripple_note": "MP-001 changed risk 96 -> 75 and action Pending triage -> Suggested Fix.",
+      "audit_blocker_probability": 0.623,
+      "credible_interval_low": 0.447,
+      "credible_interval_high": 0.781,
       "uncertainty_level": "high",
-      "probabilistic_reason": "rule score 74/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty; Memory Ripple explains part of the conflict",
+      "probabilistic_reason": "rule score 75/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty; Memory Ripple explains part of the conflict",
+      "scoring_method": "pymc_beta",
+      "memory_status": "active"
+    },
+    {
+      "finding_id": "F-DC-001",
+      "type": "FindingCard",
+      "severity": "High",
+      "risk_score": 74,
+      "confidence": 0.88,
+      "affected_entity": "plant_id: A",
+      "audit_risk": "May weaken audit readiness.",
+      "why_broken": "",
+      "suggested_action": "Manual Review Required",
+      "status": "open",
+      "evidence": [
+        {
+          "source_file": "track01_data_rescue.csv",
+          "row_number": "3",
+          "field_name": "customer_id",
+          "observed_value": "CX-A228",
+          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
+          "explanation": "Customer reference does not appear in the companion customer master file."
+        },
+        {
+          "source_file": "track01_data_rescue.csv",
+          "row_number": "51",
+          "field_name": "customer_id",
+          "observed_value": "CX-G153",
+          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
+          "explanation": "Customer reference does not appear in the companion customer master file."
+        },
+        {
+          "source_file": "track01_data_rescue.csv",
+          "row_number": "87",
+          "field_name": "customer_id",
+          "observed_value": "CX-E185",
+          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
+          "explanation": "Customer reference does not appear in the companion customer master file."
+        },
+        {
+          "source_file": "track01_data_rescue.csv",
+          "row_number": "276",
+          "field_name": "customer_id",
+          "observed_value": "CX-N823",
+          "expected_or_conflicting_value": "customer_id present in track01_customers.csv",
+          "explanation": "Customer reference does not appear in the companion customer master file."
+        }
+      ],
+      "created_by_agent": "Data Ingestion & Detective Agent",
+      "last_updated_by_agent": "Reconciliation & Remediation Agent",
+      "ranking_reason": "Broken referential integrity (customer_id in transactions not present in customer master) undermines customer traceability and can block reconciliations/sampling during audit. Typically less severe than impossible chronology but still a material control gap if widespread.",
+      "action_rationale": "Broken referential integrity (transaction customer_id not in customer master) cannot be safely auto-corrected without confirming whether the master is incomplete, IDs are mis-keyed, or transactions reference a different customer namespace.",
+      "ripple_note": "",
+      "audit_blocker_probability": 0.681,
+      "credible_interval_low": 0.501,
+      "credible_interval_high": 0.839,
+      "uncertainty_level": "high",
+      "probabilistic_reason": "rule score 74/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     },
     {
       "finding_id": "F-DC-006",
       "type": "FindingCard",
-      "severity": "High",
-      "risk_score": 74,
-      "confidence": 0.76,
+      "severity": "Medium",
+      "risk_score": 65,
+      "confidence": 0.72,
       "affected_entity": "track01_data_rescue",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
-      "suggested_action": "Pending triage",
+      "suggested_action": "Suggested Fix",
       "status": "open",
       "evidence": [
         {
@@ -381,14 +381,14 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Duplicate row signatures can cause double counting of production/inspection/shipment events, creating financial misstatement and audit exceptions. Elevated to High because duplicates often indicate ETL/control weaknesses; still below chronology and core quantity integrity issues.",
-      "action_rationale": "",
+      "ranking_reason": "Potential duplicate row signatures risk double-counting production/inspection/shipment events and can bias totals. Usually remediable with deduplication rules and controls; lower regulatory risk than impossible dates.",
+      "action_rationale": "Potential duplicate row signatures are often remediable with deterministic deduplication, but should start as a suggested fix because the evidence indicates 'signature' duplicates (not confirmed full-row duplicates).",
       "ripple_note": "",
-      "audit_blocker_probability": 0.685,
-      "credible_interval_low": 0.517,
-      "credible_interval_high": 0.841,
+      "audit_blocker_probability": 0.631,
+      "credible_interval_low": 0.452,
+      "credible_interval_high": 0.8,
       "uncertainty_level": "high",
-      "probabilistic_reason": "rule score 74/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 65/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     },
@@ -396,12 +396,12 @@
       "finding_id": "F-DC-004",
       "type": "FindingCard",
       "severity": "Medium",
-      "risk_score": 72,
-      "confidence": 0.7,
+      "risk_score": 60,
+      "confidence": 0.65,
       "affected_entity": "track01_data_rescue",
       "audit_risk": "May weaken audit readiness.",
       "why_broken": "",
-      "suggested_action": "Pending triage",
+      "suggested_action": "Suggested Fix",
       "status": "open",
       "evidence": [
         {
@@ -439,14 +439,14 @@
       ],
       "created_by_agent": "Data Ingestion & Detective Agent",
       "last_updated_by_agent": "Reconciliation & Remediation Agent",
-      "ranking_reason": "Unit semantics mismatch (quantity paired with 'mm') risks incorrect aggregation/conversion and downstream reporting errors. Typically not an immediate regulatory blocker unless it feeds regulated measurements; without evidence of conversion/usage in compliance reporting, this is prioritized below chronology, inventory integrity, and duplication risks.",
-      "action_rationale": "",
+      "ranking_reason": "Quantity paired with physical measurement units (e.g., mm) indicates semantic/definition ambiguity (count vs measurement). This can cause misinterpretation in reporting but is less likely to be an immediate audit blocker than chronology or referential breaks.",
+      "action_rationale": "Unit/quantity semantics ambiguity (e.g., unit=mm) is primarily a data-definition/control issue. It can be addressed by clarifying the meaning of quantity and enforcing unit rules, but requires business confirmation.",
       "ripple_note": "",
-      "audit_blocker_probability": 0.669,
-      "credible_interval_low": 0.492,
-      "credible_interval_high": 0.824,
+      "audit_blocker_probability": 0.593,
+      "credible_interval_low": 0.41,
+      "credible_interval_high": 0.762,
       "uncertainty_level": "high",
-      "probabilistic_reason": "rule score 72/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
+      "probabilistic_reason": "rule score 60/100; 4 evidence pointers; FindingCard issue prior; multiple evidence pointers narrow uncertainty",
       "scoring_method": "pymc_beta",
       "memory_status": "active"
     }
@@ -480,7 +480,7 @@
     },
     {
       "decision_id": "RD-002",
-      "finding_id": "F-DC-005",
+      "finding_id": "F-DC-001",
       "conflict": "",
       "chosen_resolution": "",
       "evidence_refs": [],
@@ -508,7 +508,7 @@
     },
     {
       "decision_id": "RD-004",
-      "finding_id": "F-DC-006",
+      "finding_id": "F-DC-005",
       "conflict": "",
       "chosen_resolution": "",
       "evidence_refs": [],
@@ -522,7 +522,7 @@
     },
     {
       "decision_id": "RD-005",
-      "finding_id": "F-DC-001",
+      "finding_id": "F-DC-006",
       "conflict": "",
       "chosen_resolution": "",
       "evidence_refs": [],
@@ -826,19 +826,19 @@
         "F-DC-002"
       ],
       "before": {
-        "risk_score": 95,
-        "severity": "Critical",
+        "risk_score": 96,
+        "severity": "critical",
         "action": "Pending triage",
         "interpretation": ""
       },
       "after": {
-        "risk_score": 74,
+        "risk_score": 75,
         "severity": "High",
         "action": "Suggested Fix",
         "interpretation": "Partially explained by unit normalization; unresolved records still require review."
       },
       "status": "active",
-      "written_at": "2026-06-07T18:41:59+00:00",
+      "written_at": "2026-06-07T20:05:55+00:00",
       "type": "MemoryPatch"
     }
   ],
@@ -887,33 +887,70 @@
       "caveats": [],
       "status": "candidate",
       "type": "InsightCard"
+    }
+  ],
+  "geodo_research": [
+    {
+      "research_id": "GEO-001",
+      "entity": "Automotive & industrial parts manufacturers",
+      "entity_type": "market",
+      "summary": "Geodo research on the discrete-manufacturing audit market shows that tier-1 and tier-2 parts suppliers are the highest-volume users of warehouse and production records during financial and quality audits.",
+      "key_facts": [
+        "Inventory existence and cutoff are the two most-tested assertions for parts manufacturers.",
+        "Auditors routinely sample production, shipment, and customer-master records together.",
+        "Unit-of-measure and quantity definitions are a recurring source of restatement risk."
+      ],
+      "risk_implication": "Chronology breaches and unit-conflict findings map directly to the assertions auditors test first, so they should rank as top remediation priorities.",
+      "source_url": "https://geodo.ai",
+      "confidence": 0.82,
+      "status": "active",
+      "type": "GeodoResearch"
     },
     {
-      "insight_id": "IN-006",
-      "claim": "",
-      "evidence_refs": [],
-      "confidence": 0.78,
-      "caveats": [],
-      "status": "candidate",
-      "type": "InsightCard"
+      "research_id": "GEO-002",
+      "entity": "External audit firms (Big Four + regional)",
+      "entity_type": "company",
+      "summary": "Geodo research on audit-firm buyers indicates strong demand for tools that produce evidence-linked, reviewer-ready workpapers rather than raw anomaly lists.",
+      "key_facts": [
+        "Reviewers reject findings that cannot be traced to a source file, row, and field.",
+        "Sign-off requires a documented remediation decision per exception.",
+        "Probabilistic confidence framing is increasingly expected in risk reporting."
+      ],
+      "risk_implication": "Every finding the agents emit must carry row-level evidence and an explicit action rationale to be usable by an audit reviewer.",
+      "source_url": "https://geodo.ai",
+      "confidence": 0.79,
+      "status": "active",
+      "type": "GeodoResearch"
+    },
+    {
+      "research_id": "GEO-003",
+      "entity": "Manufacturing compliance & internal-control teams",
+      "entity_type": "customer",
+      "summary": "Geodo research on internal compliance buyers shows their primary pain is master-data gaps — transactions referencing customers or parts that are missing from the master files.",
+      "key_facts": [
+        "Orphaned customer references are a leading cause of audit evidence-chain breaks.",
+        "Teams want a single readiness score they can show leadership before sign-off.",
+        "Repeat findings across periods erode auditor trust faster than one-off errors."
+      ],
+      "risk_implication": "Master-data-gap findings deserve prominent narrative treatment, and the readiness score should be the headline metric for this buyer.",
+      "source_url": "https://geodo.ai",
+      "confidence": 0.8,
+      "status": "active",
+      "type": "GeodoResearch"
     }
   ],
   "report": {
-    "report_id": "AR-20260607184450",
-    "readiness_score": 68,
-    "readiness_probability": 0.426,
-    "readiness_interval_low": 0.211,
-    "readiness_interval_high": 0.654,
+    "report_id": "AR-20260607200556",
+    "readiness_score": 71,
+    "readiness_probability": 0.467,
+    "readiness_interval_low": 0.226,
+    "readiness_interval_high": 0.716,
     "readiness_uncertainty": "high",
-    "readiness_reason": "aggregated 6 finding blocker probabilities; residual blocker load 3.01; 1 findings have fixable actions; 2 critical blockers remain; 1 Memory Patch update applied",
+    "readiness_reason": "aggregated 6 finding blocker probabilities; residual blocker load 2.90; 1 findings have fixable actions; 0 critical blockers remain; 1 Memory Patch update applied",
     "readiness_method": "pymc_beta",
-    "executive_summary": "Audit Passport reviewed 6 evidence-backed findings. 5 findings are Critical or High priority and should be addressed before regulatory sign-off. A new-evidence ripple has updated the report.",
+    "executive_summary": "Audit Passport reviewed 6 evidence-backed findings. 1 findings are Critical or High priority and should be addressed before regulatory sign-off. A new-evidence ripple has updated the report.",
     "critical_findings": [
-      "F-DC-005",
-      "F-DC-003",
-      "F-DC-001",
-      "F-DC-002",
-      "F-DC-006"
+      "F-DC-002"
     ],
     "ripple_updates": [
       "MP-001"
@@ -946,7 +983,7 @@
       "memory_reads": 3,
       "memory_writes": 6,
       "status": "active",
-      "written_at": "2026-06-07T18:39:22+00:00",
+      "written_at": "2026-06-07T20:04:00+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -969,7 +1006,7 @@
       "memory_reads": 3,
       "memory_writes": 4,
       "status": "active",
-      "written_at": "2026-06-07T18:40:02+00:00",
+      "written_at": "2026-06-07T20:04:24+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -991,7 +1028,7 @@
       "memory_reads": 2,
       "memory_writes": 4,
       "status": "active",
-      "written_at": "2026-06-07T18:40:38+00:00",
+      "written_at": "2026-06-07T20:04:57+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -1016,7 +1053,7 @@
       "memory_reads": 5,
       "memory_writes": 4,
       "status": "active",
-      "written_at": "2026-06-07T18:41:29+00:00",
+      "written_at": "2026-06-07T20:05:34+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -1039,7 +1076,7 @@
       "memory_reads": 4,
       "memory_writes": 3,
       "status": "active",
-      "written_at": "2026-06-07T18:41:57+00:00",
+      "written_at": "2026-06-07T20:05:55+00:00",
       "type": "AgentOutcome"
     },
     {
@@ -1053,7 +1090,7 @@
       "wrote_datasets": [
         "agent_outcomes"
       ],
-      "outcome": "MP-001 updated F-DC-002: risk 95 -> 74, action Pending triage -> Suggested Fix.",
+      "outcome": "MP-001 updated F-DC-002: risk 96 -> 75, action Pending triage -> Suggested Fix.",
       "reason": "The demo proves that one agent's memory update changes downstream ranking and narrative.",
       "evidence_refs": [
         "F-DC-002",
@@ -1062,17 +1099,17 @@
       "memory_reads": 3,
       "memory_writes": 2,
       "status": "active",
-      "written_at": "2026-06-07T18:46:04+00:00",
+      "written_at": "2026-06-07T20:05:57+00:00",
       "type": "AgentOutcome"
     }
   ],
   "prompt_traces": [
     {
-      "trace_id": "TRACE-20260607183922-Data-Ing",
+      "trace_id": "TRACE-20260607200400-Data-Ing",
       "agent": "Data Ingestion & Detective Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
-      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"prior_cognee_context\": 2, \"sources\": 2, \"schemas\": 2, \"detection_candidates\": 6, \"output_contract\": \"Return findings[] as FindingCard-shaped objects and outcome as AgentOutcome-shap\"}",
+      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"prior_cognee_context\": 0, \"sources\": 2, \"schemas\": 2, \"detection_candidates\": 6, \"output_contract\": \"Return findings[] as FindingCard-shaped objects and outcome as AgentOutcome-shap\"}",
       "output_validation_status": "valid",
       "recalled_datasets": [
         "sources",
@@ -1084,13 +1121,13 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_031184479c3c50ec006a25bab651cc8197ba995d2234beebbd",
+      "response_id": "resp_052800aa2de77c4d006a25ce8c0db08197bbb017a1d1da02aa",
       "status": "active",
-      "written_at": "2026-06-07T18:39:22+00:00",
+      "written_at": "2026-06-07T20:04:00+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607183956-Classifi",
+      "trace_id": "TRACE-20260607200420-Classifi",
       "agent": "Classification & Risk Prioritizer Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
@@ -1107,13 +1144,13 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_0628a847bbffc8ed006a25bae125ac81938d6988a4e9b8ba20",
+      "response_id": "resp_0d497a4e5f56fe3f006a25ceafb8e8819595b7cbcc97551342",
       "status": "active",
-      "written_at": "2026-06-07T18:39:56+00:00",
+      "written_at": "2026-06-07T20:04:20+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607184038-Reconcil",
+      "trace_id": "TRACE-20260607200457-Reconcil",
       "agent": "Reconciliation & Remediation Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
@@ -1129,42 +1166,44 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_0a18603872a9d0e0006a25bb088a3881978184da5786cd64fc",
+      "response_id": "resp_0711451023480621006a25cec7f3c881948c601d35014d7302",
       "status": "active",
-      "written_at": "2026-06-07T18:40:38+00:00",
+      "written_at": "2026-06-07T20:04:57+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607184129-Narrativ",
+      "trace_id": "TRACE-20260607200533-Narrativ",
       "agent": "Narrative & Audit Report Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
-      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"recalled_findings\": 6, \"recalled_decisions\": 0, \"recalled_baselines\": 1, \"patches\": 0, \"output_contract\": \"Return insights, report_narrative{executive_summary,open_risks[]}, and outcome.\"}",
+      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"recalled_findings\": 6, \"recalled_decisions\": 0, \"recalled_baselines\": 1, \"geodo_research\": 3, \"patches\": 0, \"output_contract\": \"Return insights, report_narrative{executive_summary,open_risks[]}, and outcome.\"}",
       "output_validation_status": "valid",
       "recalled_datasets": [
         "findings",
         "baselines",
         "reconciliation",
+        "geodo_research",
         "memory_patches",
         "agent_outcomes"
       ],
       "wrote_datasets": [
         "insights",
         "reports",
+        "geodo_research",
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_011e2b749b91b428006a25bb2f11248195aced92109d18df4b",
+      "response_id": "resp_009853beb5799e14006a25cee8845081938d79998f5a627e52",
       "status": "active",
-      "written_at": "2026-06-07T18:41:29+00:00",
+      "written_at": "2026-06-07T20:05:33+00:00",
       "type": "AgentPromptTrace"
     },
     {
-      "trace_id": "TRACE-20260607184157-UI-Demo-",
+      "trace_id": "TRACE-20260607200555-UI-Demo-",
       "agent": "UI Demo & Feedback Agent",
       "model": "gpt-5.2",
       "prompt_version": "audit-passport-gpt-cognee-v1",
-      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"recalled_outcomes\": 11, \"recalled_insights\": 6, \"memory_event_count\": \"113\", \"explicit_user_feedback\": \"\", \"output_contract\": \"Return feedback_digest and outcome.\"}",
+      "input_summary": "{\"agent_setting\": [\"goal\", \"role\"], \"recalled_outcomes\": 4, \"recalled_insights\": 5, \"memory_event_count\": \"35\", \"explicit_user_feedback\": \"\", \"output_contract\": \"Return feedback_digest and outcome.\"}",
       "output_validation_status": "valid",
       "recalled_datasets": [
         "agent_outcomes",
@@ -1177,9 +1216,9 @@
         "agent_outcomes",
         "prompt_traces"
       ],
-      "response_id": "resp_096474bd75be60ec006a25bb6743c481978627007082889769",
+      "response_id": "resp_05d473574b23bd63006a25cf0e160c81979d0d56cf1227e112",
       "status": "active",
-      "written_at": "2026-06-07T18:41:57+00:00",
+      "written_at": "2026-06-07T20:05:55+00:00",
       "type": "AgentPromptTrace"
     }
   ],
@@ -1187,530 +1226,138 @@
     "digest_id": "FD-001",
     "summary": "",
     "recommended_next_action": "",
-    "memory_timeline_health": "",
+    "memory_timeline_health": "{'status': 'degraded (incomplete + low auditability)', 'signals': {'event_volume': '35 memory events recorded (sufficient activity to review)', 'agent_handoff_chain_present': 'Yes: 4 agent outcomes recorded in sequence (Ingestion → Classification → Reconciliation → Narrative)', 'critical_fields_missing': 'AgentOutcome objects have empty `task/outcome/reason` and empty `evidence_refs`; InsightCards have empty `claim` and empty `evidence_refs`', 'state_management_issue': 'All AgentOutcomes remain `status: active` despite being written in the past—suggests missing terminal transitions (e.g., completed/failed) or the UI is only showing partial snapshots', 'confidence_pattern': 'All 5 InsightCards show identical confidence (0.78) with no claims—may be placeholder/default scoring rather than evidence-based scoring'}, 'why_it_matters_for_compliance': 'As-is, the timeline is not defensible for audit: findings/insights are not attributable to sources, no rationale is recorded, and nothing is in a reviewable ‘final’ state.'}",
     "evidence_refs": [],
     "status": "active",
-    "written_at": "2026-06-07T18:41:57+00:00",
+    "written_at": "2026-06-07T20:05:55+00:00",
     "type": "FeedbackDigest"
   },
   "memory_events": [
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:sources, project:audit_passport:schema, project:audit_passport:memory_patches",
       "summary": "Find prior data source, schema, active memory patches, and past ingestion decisions before ingesting Kaggle audit data.",
-      "status": "ok",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
+      "event_type": "remember_batch_skipped",
       "dataset": "project:audit_passport:sources",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "2 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:sources",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:sources",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:sources",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:sources', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
+      "event_type": "remember_batch_skipped",
       "dataset": "project:audit_passport:schema",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "2 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:schema",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:schema",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:schema",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:schema', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
+      "event_type": "remember_batch_skipped",
       "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "6 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:detection_candidates",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:detection_candidates', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
+      "event_type": "remember_batch_skipped",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "6 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:ingest', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Data Ingestion & Detective Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "memory_error",
-      "dataset": "project:audit_passport:findings",
-      "summary": "DatasetNotFoundError: No datasets found. (Status code: 404)",
-      "status": "error",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:findings",
-      "summary": "Used 6 cards from current run local memory after Cognee recall returned no parseable cards.",
+      "summary": "active",
       "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
+      "dataset": "project:audit_passport:findings",
+      "summary": "Recall every active FindingCard created by Agent 1 for risk ranking.",
+      "status": "local",
+      "error": ""
+    },
+    {
+      "agent": "Classification & Risk Prioritizer Agent",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:sources",
       "summary": "Recall source cards for ranking context.",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:sources",
-      "summary": "Used 2 cards from current run local memory after Cognee recall returned no parseable cards.",
       "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:schema",
       "summary": "Recall schema cards for ranking context.",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:schema",
-      "summary": "Used 2 cards from current run local memory after Cognee recall returned no parseable cards.",
       "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:baselines",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:baselines', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:baselines",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:baselines', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
+      "event_type": "remember_batch_skipped",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "6 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:classify', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "memory_error",
-      "dataset": "project:audit_passport:findings",
-      "summary": "DatasetNotFoundError: No datasets found. (Status code: 404)",
-      "status": "error",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:findings",
-      "summary": "Used 12 cards from current run local memory after Cognee recall returned no parseable cards.",
+      "summary": "active",
       "status": "local",
       "error": ""
     },
     {
       "agent": "Reconciliation & Remediation Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
+      "dataset": "project:audit_passport:findings",
+      "summary": "Recall ranked FindingCards with probability fields for remediation planning.",
+      "status": "local",
+      "error": ""
+    },
+    {
+      "agent": "Reconciliation & Remediation Agent",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:baselines",
       "summary": "Recall classification baseline.",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:baselines",
-      "summary": "Used 1 cards from current run local memory after Cognee recall returned no parseable cards.",
       "status": "local",
       "error": ""
     },
@@ -1764,453 +1411,191 @@
     },
     {
       "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
+      "event_type": "remember_batch_skipped",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "6 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:findings', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:reconcile', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "memory_error",
-      "dataset": "project:audit_passport:findings",
-      "summary": "DatasetNotFoundError: No datasets found. (Status code: 404)",
-      "status": "error",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:findings",
-      "summary": "Used 18 cards from current run local memory after Cognee recall returned no parseable cards.",
+      "summary": "active",
       "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "memory_error",
-      "dataset": "project:audit_passport:reconciliation",
-      "summary": "DatasetNotFoundError: No datasets found. (Status code: 404)",
-      "status": "error",
+      "event_type": "recall_skipped",
+      "dataset": "project:audit_passport:findings",
+      "summary": "Recall final remediated findings for the report.",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
+      "dataset": "project:audit_passport:reconciliation",
+      "summary": "Recall remediation decisions for the report.",
+      "status": "local",
+      "error": ""
+    },
+    {
+      "agent": "Narrative & Audit Report Agent",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:baselines",
       "summary": "Recall baselines for the report.",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:baselines",
-      "summary": "Used 1 cards from current run local memory after Cognee recall returned no parseable cards.",
       "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
+      "event_type": "remember_batch_skipped",
+      "dataset": "project:audit_passport:geodo_research",
+      "summary": "3 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
+      "event_type": "remember_batch_skipped",
       "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "5 cards",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:insights",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:insights', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:reports",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:reports', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:reports",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:reports', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:narrative', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "UI Demo & Feedback Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:agent_outcomes",
       "summary": "Recall all agent outcomes for UI timeline digest.",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "UI Demo & Feedback Agent",
-      "event_type": "memory_error",
-      "dataset": "project:audit_passport:insights",
-      "summary": "DatasetNotFoundError: No datasets found. (Status code: 404)",
-      "status": "error",
-      "error": ""
-    },
-    {
-      "agent": "UI Demo & Feedback Agent",
-      "event_type": "recall_local_fallback",
-      "dataset": "project:audit_passport:insights",
-      "summary": "Used 6 cards from current run local memory after Cognee recall returned no parseable cards.",
       "status": "local",
       "error": ""
     },
     {
       "agent": "UI Demo & Feedback Agent",
-      "event_type": "remember",
+      "event_type": "recall_skipped",
+      "dataset": "project:audit_passport:insights",
+      "summary": "Recall insights for UI digest.",
+      "status": "local",
+      "error": ""
+    },
+    {
+      "agent": "UI Demo & Feedback Agent",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:feedback_digests",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:feedback_digests', session_id='ap:audit_passport:run-20260607183745:ui', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "UI Demo & Feedback Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:feedback_digests",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:feedback_digests', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "UI Demo & Feedback Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:ui', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "UI Demo & Feedback Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:agent_outcomes', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "UI Demo & Feedback Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:ui', elapsed=0.0s)",
-      "status": "ok",
-      "error": ""
-    },
-    {
-      "agent": "UI Demo & Feedback Agent",
-      "event_type": "remember_shared",
-      "dataset": "project:audit_passport:prompt_traces",
-      "summary": "RememberResult(status='session_stored', dataset='project:audit_passport:prompt_traces', session_id='ap:audit_passport:run-20260607183745:shared', elapsed=0.0s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Reconciliation & Remediation Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:memory_patches",
-      "summary": "RememberResult(status='completed', dataset='project:audit_passport:memory_patches', dataset_id='c5acaa5c-feac-52b0-9471-ab10a1afdf43', pipeline_run_id='8735427a-c75c-5f58-ba9d-f320ff1362ae', elapsed=57.3s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Data Ingestion & Detective Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:memory_patches, project:audit_passport:findings, project:audit_passport:schema",
       "summary": "Reclassify F-DC-002 after active MemoryPatch MP-001.",
-      "status": "ok",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:memory_patches, project:audit_passport:findings, project:audit_passport:baselines",
       "summary": "Re-rank F-DC-002 after MemoryPatch MP-001.",
-      "status": "ok",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "recall",
+      "event_type": "recall_skipped",
       "dataset": "project:audit_passport:memory_patches, project:audit_passport:findings, project:audit_passport:reconciliation, project:audit_passport:reports",
       "summary": "Regenerate report paragraph after MemoryPatch MP-001.",
-      "status": "ok",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Classification & Risk Prioritizer Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:findings",
-      "summary": "RememberResult(status='completed', dataset='project:audit_passport:findings', dataset_id='43ede148-a0f5-5af3-8692-be73f741cba9', pipeline_run_id='8fe97978-1a0a-5bee-be0d-23fb40df7eff', elapsed=64.5s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "Narrative & Audit Report Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:reports",
-      "summary": "RememberResult(status='completed', dataset='project:audit_passport:reports', dataset_id='60944213-7bbe-5008-9b2e-d19c74f8a836', pipeline_run_id='5d5be7e4-35de-5e5f-a441-fedf921b936e', elapsed=73.5s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     },
     {
       "agent": "UI Demo & Feedback Agent",
-      "event_type": "remember",
+      "event_type": "remember_skipped",
       "dataset": "project:audit_passport:agent_outcomes",
-      "summary": "RememberResult(status='completed', dataset='project:audit_passport:agent_outcomes', dataset_id='cfc5c17d-8473-58a2-9360-39623f231102', pipeline_run_id='f55836c9-1f5f-5332-8efc-23c533cc7b8a', elapsed=64.1s)",
-      "status": "ok",
+      "summary": "active",
+      "status": "local",
       "error": ""
     }
   ],
-  "cognee_enabled": true,
-  "cognee_errors": [
-    "Classification & Risk Prioritizer Agent / project:audit_passport:findings: DatasetNotFoundError: No datasets found. (Status code: 404)",
-    "Reconciliation & Remediation Agent / project:audit_passport:findings: DatasetNotFoundError: No datasets found. (Status code: 404)",
-    "Narrative & Audit Report Agent / project:audit_passport:findings: DatasetNotFoundError: No datasets found. (Status code: 404)",
-    "Narrative & Audit Report Agent / project:audit_passport:reconciliation: DatasetNotFoundError: No datasets found. (Status code: 404)",
-    "UI Demo & Feedback Agent / project:audit_passport:insights: DatasetNotFoundError: No datasets found. (Status code: 404)"
-  ],
+  "cognee_enabled": false,
+  "cognee_errors": [],
   "checkpoints": [
     {
       "phase": "Agent 1",

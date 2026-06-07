@@ -20,6 +20,7 @@ from .models import (
     Evidence,
     FeedbackDigestCard,
     FindingCard,
+    GeodoResearchCard,
     InsightCard,
     PROJECT_ID,
     ReconciliationDecisionCard,
@@ -28,6 +29,7 @@ from .models import (
     new_run_id,
     slug_time,
 )
+from .geodo import load_geodo_research
 from .gpt_agents import GptAgentClient, JsonSchemaSpec
 from .probabilistic import attach_probabilistic_risk
 from .report import generate_pdf
@@ -48,6 +50,46 @@ def severity_from_score(score: int) -> str:
     if score >= 40:
         return "Medium"
     return "Low"
+
+
+CANONICAL_SEVERITIES = ("Critical", "High", "Medium", "Low")
+CANONICAL_ACTIONS = ("Safe Auto-Fix", "Suggested Fix", "Manual Review Required", "Escalate")
+
+
+def normalize_severity(value: object, score: int | None = None) -> str:
+    """Coerce an LLM-provided severity to the canonical Title-Case enum.
+
+    Models occasionally emit lowercase or unexpected strings; fall back to the
+    deterministic score mapping so downstream metrics and the report stay consistent.
+    """
+    text = str(value or "").strip()
+    for canonical in CANONICAL_SEVERITIES:
+        if text.lower() == canonical.lower():
+            return canonical
+    return severity_from_score(int(score or 0))
+
+
+def action_from_score(score: int) -> str:
+    if score >= 85:
+        return "Escalate"
+    if score >= 70:
+        return "Manual Review Required"
+    if score >= 50:
+        return "Suggested Fix"
+    return "Safe Auto-Fix"
+
+
+def normalize_action(value: object, score: int | None = None) -> str:
+    """Coerce an LLM-provided remediation action to the canonical enum.
+
+    If the model omitted the field (leaving "Pending triage") or returned an
+    off-contract string, derive a defensible action from the risk score.
+    """
+    text = str(value or "").strip()
+    for canonical in CANONICAL_ACTIONS:
+        if text.lower() == canonical.lower():
+            return canonical
+    return action_from_score(int(score or 0))
 
 
 def entity_label(table: LoadedTable, row_index: int | None = None) -> str:
@@ -445,7 +487,7 @@ def finding_from_agent(data: dict[str, Any], agent: str) -> FindingCard:
     return FindingCard(
         finding_id=str(data.get("finding_id") or f"F-{slug_time()}"),
         type=str(data.get("type") or data.get("candidate_type") or "Audit finding"),
-        severity=str(data.get("severity") or severity_from_score(score)),
+        severity=normalize_severity(data.get("severity"), score),
         risk_score=max(0, min(100, score)),
         confidence=float(data.get("confidence", 0.78)),
         affected_entity=str(data.get("affected_entity", "")),
@@ -622,7 +664,7 @@ async def run_risk_prioritizer(
                 replace(
                     finding,
                     risk_score=score,
-                    severity=str(update.get("severity") or severity_from_score(score)),
+                    severity=normalize_severity(update.get("severity"), score),
                     confidence=float(update.get("confidence", finding.confidence)),
                     ranking_reason=str(update.get("ranking_reason", "")),
                     last_updated_by_agent=agent,
@@ -681,7 +723,7 @@ async def run_remediation_planner(
         planned.append(
             replace(
                 finding,
-                suggested_action=str(update.get("suggested_action", finding.suggested_action)),
+                suggested_action=normalize_action(update.get("suggested_action"), finding.risk_score),
                 action_rationale=str(update.get("action_rationale", "")),
                 last_updated_by_agent=agent,
             )
@@ -715,27 +757,31 @@ async def run_audit_narrator(
     llm: GptAgentClient,
     sessions: dict[str, str],
     patches: list,
-) -> tuple[list[InsightCard], object, list[AgentOutcomeCard], list[AgentPromptTraceCard]]:
+) -> tuple[list[InsightCard], object, list[GeodoResearchCard], list[AgentOutcomeCard], list[AgentPromptTraceCard]]:
     agent = AGENT_4
     session_id = sessions["narrative"]
     shared_session_id = sessions["shared"]
     findings = latest_findings(await memory.recall_cards("Recall final remediated findings for the report.", ["findings"], agent, (FindingCard,), top_k=80, session_id=shared_session_id, required=True))
     decisions = await memory.recall_cards("Recall remediation decisions for the report.", ["reconciliation"], agent, (ReconciliationDecisionCard,), top_k=80, session_id=shared_session_id)
     baselines = await memory.recall_cards("Recall baselines for the report.", ["baselines"], agent, (ClassificationBaselineCard,), top_k=10, session_id=shared_session_id)
+    # R04: Domain Expert's Geodo (geodo.ai) research on real-world entities, woven into the narrative.
+    geodo_research = load_geodo_research()
+    await remember_many(memory, geodo_research, "geodo_research", agent, session_id, shared_session_id)
     result = await llm.run_json(
         agent,
-        "You are Agent 4, the narrative and audit report agent. Write compliance-officer readable claims from recalled memory cards only. The PDF renderer will render your narrative.",
+        "You are Agent 4, the narrative and audit report agent. Write compliance-officer readable claims from recalled memory cards only. Ground the story in the provided Geodo real-world research so the narrative reflects how real audit firms, manufacturers, and compliance teams use these records. The PDF renderer will render your narrative.",
         {
             "agent_setting": {"role": agent, "goal": "produce evidence-backed audit narrative"},
             "recalled_findings": [card_dict(item) for item in findings],
             "recalled_decisions": [card_dict(item) for item in decisions],
             "recalled_baselines": [card_dict(item) for item in baselines],
+            "geodo_research": [card_dict(item) for item in geodo_research],
             "patches": [card_dict(item) for item in patches],
             "output_contract": "Return insights, report_narrative{executive_summary,open_risks[]}, and outcome.",
         },
         NARRATIVE_SCHEMA,
-        ["findings", "baselines", "reconciliation", "memory_patches", "agent_outcomes"],
-        ["insights", "reports", "agent_outcomes", "prompt_traces"],
+        ["findings", "baselines", "reconciliation", "geodo_research", "memory_patches", "agent_outcomes"],
+        ["insights", "reports", "geodo_research", "agent_outcomes", "prompt_traces"],
     )
     insights = [
         InsightCard(
@@ -759,7 +805,7 @@ async def run_audit_narrator(
     await memory.remember_card(report, "reports", agent, session_id=session_id, shared_session_id=shared_session_id)
     await memory.remember_card(outcome, "agent_outcomes", agent, session_id=session_id, shared_session_id=shared_session_id)
     await remember_trace(memory, result.trace, agent, session_id, shared_session_id)
-    return insights, report, [outcome], [result.trace]
+    return insights, report, geodo_research, [outcome], [result.trace]
 
 
 async def run_ui_feedback_agent(
@@ -836,8 +882,9 @@ async def run_audit_pipeline(data_dir: Path, use_cognee: bool = True) -> AuditRu
     run.outcomes.extend(outcomes)
     run.prompt_traces.extend(traces)
 
-    insights, report, outcomes, traces = await run_audit_narrator(memory, llm, sessions, run.patches)
+    insights, report, geodo_research, outcomes, traces = await run_audit_narrator(memory, llm, sessions, run.patches)
     run.insights = insights
+    run.geodo_research = geodo_research
     run.report = report
     run.outcomes.extend(outcomes)
     run.prompt_traces.extend(traces)
